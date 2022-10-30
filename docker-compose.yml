@@ -1,0 +1,54 @@
+version: '3.9'
+
+# networks:
+#   blockchain-iot:
+#     driver: bridge
+#     attachable: true
+#     ipam:
+#       config:
+#         - subnet: 186.10.0.0/23
+
+services:
+  blockchain-iot:
+    build: 
+      context: .
+      # Choose 'development' for build with dev and test dependencies
+      # Choose 'test' for build that runs unit and coverage tests automatically
+      # Remove this target or set to 'production' for build with production dependencies
+      target: development
+    env_file:
+      - .env
+    image: blockchain-iot:latest
+    environment:
+      - TZ=America/Sao_Paulo
+      - ENVIRONMENT=dev
+    # networks:
+    #   - blockchain-iot
+    volumes:
+      - ${PWD}:/app
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    security_opt:
+      - no-new-privileges
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    container_name: blockchain-iot
+    # depends_on:
+    #   - postgres
+
+  # postgres:
+  #   container_name: postgres
+  #   image: postgres:14.5-bullseye
+  #   ports:
+  #     - 5432:5432
+  #   environment:
+  #     POSTGRES_USER: postuser
+  #     POSTGRES_PASSWORD: postpw
+  #     POSTGRES_DB: koclouds
+  #     PGDATA: /data/postgres
+  #   restart: always
+  #   networks:
+  #     - blockchain-iot
+  #   volumes:
+  #     - ./postgres/:/data/postgres
