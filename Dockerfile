@@ -27,5 +27,9 @@ EXPOSE 3000
 
 FROM base AS development
 ENV NODE_ENV=development
-CMD tail -f /dev/null
-# CMD [ "/bin/sh", "-c", "yarn install; yarn watch" ]
+
+# Used to configure container dependencies on first time
+# CMD tail -f /dev/null
+
+# Execute tsc to watch files
+CMD [ "/bin/sh", "-c", "yarn install; yarn watch" ]
