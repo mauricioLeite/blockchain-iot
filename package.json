@@ -1,7 +1,7 @@
 {
   "name": "blockchain-iot",
   "version": "0.0.1",
-  "description": "Client side of blockchain system to manage iot devices network",
+  "description": "Simple client side using blockchain system to manage iot devices network",
   "main": "index.js",
   "scripts": {
     "watch": "tsc -w",
