@@ -3,15 +3,15 @@ export class Block {
     index?: number
     transaction: { [x: string]: any }
     previousHash: string
-    createdAt: Date | null
+    createdAt?: Date | null
     nounce: number
-    hash: string | null
+    hash?: string | null
 
     constructor(
         _index: number,
         _transaction: { [x: string]: any },
         _previousHash: string,
-        _created_at: Date | null,
+        _created_at: Date | null = null,
         _nounce = 0,
         _hash: string | null = null
     ) {
