@@ -7,12 +7,12 @@ import { request } from 'https';
 // Classe que lida com comunicação e armazenamento de dados relacionados à blockchain
 export class NodeService {
 
-    private storage: any;
-    private library: any;
+    #storage: any;
+    #library: any;
 
     constructor(storage: any, library: any) {
-        this.storage = storage;
-        this.library = library;
+        this.#storage = storage;
+        this.#library = library;
     }
 
     /*
@@ -26,8 +26,8 @@ export class NodeService {
         }
 
         //TODO: check if node exist before insert and communicate new nodes to peers
-        this.storage.createPeersModel().insert({ ip_address: addr });
-        return new Registry(this.storage, this.library).list();
+        this.#storage.createPeersModel().insert({ ip_address: addr });
+        return new Registry(this.#storage, this.#library).list();
     }
 
     /*
@@ -48,8 +48,8 @@ export class NodeService {
 
         if (response.statusCode === 200) {
             const responsePayload = response.json();
-            this.library.createBlockchain().createChainFromDump(responsePayload.chain);
-            this.library.createPeersManager().syncPeers([addr, ...responsePayload.peers], host);
+            this.#library.createBlockchain().createChainFromDump(responsePayload.chain);
+            this.#library.createPeersManager().syncPeers([addr, ...responsePayload.peers], host);
             return { message: 'Registration successful' , status: 200};
         } else {
             return { message: 'Error registering node in network.' , status: 500};
@@ -65,7 +65,7 @@ export class NodeService {
         delete block.hash;
         delete block.createdAt;
 
-        const added = this.library.createBlockchain().addBlock(block, proof);
+        const added = this.#library.createBlockchain().addBlock(block, proof);
 
         if (!added) {
             return { message: 'The block is discarded by the node.' , status: 500};
@@ -78,8 +78,8 @@ export class NodeService {
      Limpa o armazenamento local de pares e blocos
     */
     public async clearLocal() {
-        this.storage.createPeersModel().delete();
-        this.storage.createBlockModels().delete();
+        this.#storage.createPeersModel().delete();
+        this.#storage.createBlockModels().delete();
         return { message: 'Clear complete!' , status: 200};
     }
 }
