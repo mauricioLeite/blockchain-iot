@@ -4,7 +4,7 @@ export class Block {
     transaction: { [x: string]: any }
     previousHash: string
     createdAt?: Date | null
-    nounce: number
+    nonce: number
     hash?: string | null
 
     constructor(
@@ -12,14 +12,14 @@ export class Block {
         _transaction: { [x: string]: any },
         _previousHash: string,
         _created_at: Date | null = null,
-        _nounce = 0,
+        _nonce = 0,
         _hash: string | null = null
     ) {
         this.index = _index
         this.transaction = _transaction
         this.previousHash = _previousHash
         this.createdAt = _created_at
-        this.nounce = _nounce
+        this.nonce = _nonce
         this.hash = _hash
     }
 
