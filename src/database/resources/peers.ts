@@ -1,4 +1,5 @@
-import { DatabaseConnector, PeersEntity } from "@database";
+import { Peers as PeersEntity } from "../entities/peers.entity";
+import { DatabaseConnector } from "../DatabaseConnector";
 import { Repository } from "typeorm";
 
 export class Peers {

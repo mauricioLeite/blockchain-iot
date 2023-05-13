@@ -1,5 +1,6 @@
 import { Block } from "./block"
-import { DatabaseConnector, BlockEntity } from "@database"
+import { Block as BlockEntity } from "../entities/block.entity";
+import { DatabaseConnector } from "../DatabaseConnector";
 import { InsertResult } from "typeorm";
 
 describe("resource Block", () => {

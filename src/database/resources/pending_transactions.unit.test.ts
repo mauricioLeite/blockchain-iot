@@ -1,5 +1,6 @@
 import { PendingTransactions } from "./pending_transactions"
-import { DatabaseConnector, PendingTransactionsEntity } from "@database"
+import { PendingTransactions as PendingTransactionsEntity } from "../entities/pending_transactions.entity";
+import { DatabaseConnector } from "../DatabaseConnector";
 import { InsertResult } from "typeorm";
 
 describe("resource Peers", () => {

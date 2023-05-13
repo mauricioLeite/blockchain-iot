@@ -1,4 +1,5 @@
-import { DatabaseConnector, PendingTransactionsEntity } from "@database";
+import { PendingTransactions as PendingTransactionsEntity } from "../entities/pending_transactions.entity";
+import { DatabaseConnector } from "../DatabaseConnector";
 import { Repository } from "typeorm";
 
 export class PendingTransactions {
