@@ -8,10 +8,10 @@ export class Transactions {
     create(payload: any) {
         const inserted = this.storage
             .createPendingTransactionsModel()
-            .insert({ transactions: payload })
-        if (inserted) {
-            return { message: "Transaction requested!", status: 200 }
-        }
+            .insert({ transaction: payload })
+        if (inserted)
+            return { message: "Transaction requested!", status: 201 }
+
         return { message: "Internal Error", status: 500 }
     }
 
