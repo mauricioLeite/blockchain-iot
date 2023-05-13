@@ -6,21 +6,23 @@ export class Blockchain {
     difficulty = 2
     constructor(_storage: any) {
         this.storage = _storage
-        this.createGenesisBlock()
+        this.#createGenesisBlock()
     }
-    createGenesisBlock(reference: Block | null = null) {
+
+    #createGenesisBlock(reference: Block | null = null) {
         //TODO: mudar a tipagem do blocksModel
         const blocksModel: any = this.storage.createBlockModels()
         if (blocksModel.countRows() == 0) {
+            let genesisBlock: Block;
             if (!reference) {
-                const genesisBlock = new Block(0, [], "0", new Date())
+                genesisBlock = new Block(0, [], "0", new Date())
                 genesisBlock.hash = genesisBlock.computeHash()
             } else {
                 delete reference.index
                 //TODO: validar se isso está certo e se funciona
-                const genesisBlock = reference
-                this.storage.createBlockModels().insert(genesisBlock)
+                genesisBlock = reference
             }
+            this.storage.createBlockModels().insert(genesisBlock)
         }
     }
 
@@ -41,7 +43,7 @@ export class Blockchain {
         const lastBlock = this.lastBlock()
         const newBlock = new Block(
             lastBlock.index + 1,
-            unconfirmedTransaction.get("transaction"),
+            unconfirmedTransaction.transaction,
             lastBlock.hash
         )
         const proof = this.proofOfWork(newBlock)
@@ -50,10 +52,11 @@ export class Blockchain {
     }
 
     proofOfWork(block: Block) {
-        block.nounce = 0
+        block.nonce = 0
         let computedHash = block.computeHash()
+        //TODO: Update conditional to follow startsWith validation
         while (!computedHash.startsWith(this.difficulty.toString())) {
-            block.nounce += 1
+            block.nonce += 1
             computedHash = block.computeHash()
         }
         return computedHash
@@ -64,25 +67,30 @@ export class Blockchain {
         if (previousHash !== block.previousHash) return false
         if (!this.isValidProof(block, proof)) return false
         block.hash = proof
+        //TODO: Validate if insert return inserted element id
         return this.storage.createBlockModels().insert(block)
     }
 
     isValidProof(block: Block, blockHash: string) {
         return (
+            //TODO: Update check to follow startsWith validation
             blockHash.startsWith(this.difficulty.toString()) &&
             blockHash === block.computeHash()
         )
     }
 
+    // Blockchain Consensus Logic Methods
     checkChainValidity(chain: any[]) {
-        const previousHash = this.getBlock(0).hash
-        chain.forEach((block) => {
-            if (block.index === 0 || block.index === undefined) return
+        let previousHash = this.getBlock(0).hash;
+        for (const block of chain) {
+            if (block.index == 0) continue;
             const blockHash = block.hash
-            if (!blockHash) return
+            if (!blockHash) return false;
+            
             delete block.id
             delete block.hash
             delete block.createdAt
+
             if (
                 !this.isValidProof(
                     new Block(
@@ -90,7 +98,7 @@ export class Blockchain {
                         block.transaction,
                         block.previousHash,
                         block.createdAt,
-                        block.nounce,
+                        block.nonce,
                         block.hash
                     ),
                     blockHash
@@ -98,8 +106,10 @@ export class Blockchain {
                 previousHash !== block.previousHash
             )
                 return false
-            block.hash
-        })
+            block.hash = blockHash;
+            previousHash = blockHash;
+            
+        }
         return true
     }
 
@@ -107,7 +117,7 @@ export class Blockchain {
         this.storage.createBlockModels().delete()
         chainDump.forEach((blockData) => {
             if (blockData.index === 0) {
-                this.createGenesisBlock(blockData)
+                this.#createGenesisBlock(blockData)
             } else {
                 const proof = blockData.hash
                 delete blockData.id
@@ -118,8 +128,7 @@ export class Blockchain {
                     blockData.transaction,
                     blockData.previousHash,
                     blockData.createdAt,
-                    blockData.nounce,
-                    blockData.hash
+                    blockData.nonce,
                 )
                 const added = this.addBlock(block, proof)
                 if (!added) console.log("The chain dump is tampered!!")
