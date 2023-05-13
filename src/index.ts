@@ -1,5 +1,7 @@
+import "module-alias/register";
+
 const main = async () => {
-    console.log("alo")
+    return;
 }
 
 main()

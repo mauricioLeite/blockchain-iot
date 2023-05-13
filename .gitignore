@@ -131,3 +131,6 @@ dist
 
 # postgres container folder
 /postgres
+
+# SQLite data folder
+/data
