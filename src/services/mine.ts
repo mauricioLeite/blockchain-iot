@@ -1,5 +1,5 @@
 import { request } from "https";
-
+import { Block } from "../core/block";
 export class MineService {
     storage: any
     library: any
@@ -78,8 +78,8 @@ export class MineService {
     /*
     Anunciar a inclusão de um novo bloco aos pares da rede
   */
-    announceNewBlock(block: object) {
-        if ("created_at" in block) delete block["created_at"]
+    announceNewBlock(block: Block) {
+        if ("createdAt" in block) delete block.createdAt
         const peers = this.storage.createPeersModel().getAll()
         for (const node of peers) {
             request.post(`http://${node.ip_address}/node/sync_block`, {
