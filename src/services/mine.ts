@@ -1,5 +1,6 @@
-import { request } from "https";
 import { Block } from "../core/block";
+
+import { Axios } from 'axios';
 export class MineService {
     storage: any
     library: any
@@ -53,14 +54,20 @@ export class MineService {
     /*
     Alcançar o consenso entre os pares da rede
   */
-    consensus() {
+    async consensus() {
         let longestChain = null
         let currentLen = this.library.createBlockchain().chain.length
         const peers = this.storage.createPeersModel().getAll()
         for (const node of peers) {
-            const response = request.get(`http://${node.ip_address}/registry`)
-            const length = response.json().length
-            const chain = response.json().chain
+            const options = {
+                method: 'GET',
+                url: `http://${node.ip_address}/registry`, 
+            };
+
+            const client = new Axios()
+            const response = await client.request(options);
+            const length = response.data.length
+            const chain = response.data.chain
             if (
                 length > currentLen &&
                 this.library.createBlockchain().checkChainValidity(chain)
@@ -78,13 +85,25 @@ export class MineService {
     /*
     Anunciar a inclusão de um novo bloco aos pares da rede
   */
-    announceNewBlock(block: Block) {
+    async announceNewBlock(block: Block) {
         if ("createdAt" in block) delete block.createdAt
         const peers = this.storage.createPeersModel().getAll()
+        const options: ClientOptions = {
+            method: 'POST',
+            params: { json: JSON.stringify(block) },
+        };
+        const client = new Axios()
+        
         for (const node of peers) {
-            request.post(`http://${node.ip_address}/node/sync_block`, {
-                json: JSON.stringify(block),
-            })
+            options.url = `http://${node.ip_address}/node/sync_block`;
+            await client.request(options); 
         }
     }
+}
+
+interface ClientOptions {
+    method: string,
+    url?: string,
+    params?: object,
+    headers?: object
 }
