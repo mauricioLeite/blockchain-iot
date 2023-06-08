@@ -7,20 +7,26 @@ import { DatabaseConnector } from "../DatabaseConnector";
 export class DatabaseResourceFactory {
     #databaseConnector: DatabaseConnector;
 
-    constructor(databaseConnector: DatabaseConnector) {
-        this.#databaseConnector = databaseConnector;
+    constructor(databaseConnector: DatabaseConnector | null = null) {
+        this.#databaseConnector = databaseConnector ?? new DatabaseConnector();
     }
 
-    createBlockResource() {
-        return new Block(this.#databaseConnector);
+    async createBlockResource() {
+        return await this.#initializeResource(Block);
     }
 
-    createPeersResource() {
-        return new Peers(this.#databaseConnector);
+    async createPeersResource() {
+        return await this.#initializeResource(Peers);
     }
 
-    createPendingTransactionsResource() {
-        return new PendingTransactions(this.#databaseConnector);
+    async createPendingTransactionsResource() {
+        return await this.#initializeResource(PendingTransactions);
+    }
+
+    async #initializeResource(ResourceType: any) {
+        const resource = new ResourceType(this.#databaseConnector);
+        await resource.init();
+        return resource;
     }
 
 }
