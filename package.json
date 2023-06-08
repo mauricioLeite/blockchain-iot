@@ -37,6 +37,8 @@
 	},
 	"_moduleAliases": {
 		"@database": "dist/database",
-		"@database/*": "dist/database/*"
+		"@database/*": "dist/database/*",
+		"@core": "dist/core",
+		"@core/*": "dist/core/*"
 	}
 }
