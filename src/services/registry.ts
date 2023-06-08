@@ -7,8 +7,8 @@ export class Registry {
         this.library = _library
     }
 
-    list(id: string | number | undefined = undefined) {
-        const peers = this.library.createPeersManager().list()
+    async list(id: string | number | undefined = undefined) {
+        const peers = await this.library.createPeersManager().list()
         const blockchain = this.library.createBlockchain()
         let chain
         if (id) {
