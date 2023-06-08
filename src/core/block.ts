@@ -1,4 +1,5 @@
-import crypto = require("crypto")
+import { createHash } from "crypto";
+
 export class Block {
     index?: number
     transaction: { [x: string]: any }
@@ -25,6 +26,17 @@ export class Block {
 
     computeHash(): string {
         const blockString: string = JSON.stringify(this)
-        return crypto.createHash("sha256").update(blockString).digest("hex")
+        return createHash("sha256").update(blockString).digest("hex");
+    }
+
+    databaseFormat() {
+        return { 
+            index : this.index,
+            transaction : JSON.stringify(this.transaction),
+            previous_hash : this.previousHash,
+            nonce : this.nonce,
+            hash : this.hash,
+            created_at: this.createdAt
+        };
     }
 }
