@@ -1,28 +1,12 @@
 import { PendingTransactions as PendingTransactionsEntity } from "../entities/pending_transactions.entity";
 import { DatabaseConnector } from "../DatabaseConnector";
-import { Repository } from "typeorm";
+import { Strategy } from "./strategy";
 
-export class PendingTransactions {
-    #databaseConnector: DatabaseConnector;
-    #pendingTransactionsRepository: Repository<PendingTransactionsEntity>;
+export class PendingTransactions extends Strategy {
 
     constructor(databaseConnector: DatabaseConnector) {
-        this.#databaseConnector = databaseConnector;
-    }
-
-    async init() {
-        if (this.#pendingTransactionsRepository) return false;
-        const connection = await this.#databaseConnector.getConnection();
-        this.#pendingTransactionsRepository = connection.getRepository(PendingTransactionsEntity);
-        return true;
-    }
-
-    async create(block: PendingTransactionsEntity) {
-        return await this.#pendingTransactionsRepository.insert(block);
-    }
-
-    async next() : Promise<PendingTransactionsEntity | null> {
-        return await this.#pendingTransactionsRepository.findOne({ where: {}});
+        super(databaseConnector);
+        this.entity = PendingTransactionsEntity;
     }
 
 }   

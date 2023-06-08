@@ -1,28 +1,16 @@
 import { Peers as PeersEntity } from "../entities/peers.entity";
 import { DatabaseConnector } from "../DatabaseConnector";
-import { Repository } from "typeorm";
+import { Strategy } from "./strategy";
 
-export class Peers {
-    #databaseConnector: DatabaseConnector;
-    #peersRepository: Repository<PeersEntity>;
-
+export class Peers extends Strategy {
+    
     constructor(databaseConnector: DatabaseConnector) {
-        this.#databaseConnector = databaseConnector;
-    }
-
-    async init() {
-        if (this.#peersRepository) return false;
-        const connection = await this.#databaseConnector.getConnection();
-        this.#peersRepository = connection.getRepository(PeersEntity);
-        return true;
-    }
-
-    async create(block: PeersEntity) {
-        return await this.#peersRepository.insert(block);
+        super(databaseConnector);
+        this.entity = PeersEntity;
     }
 
     async findByIp(ip: string) : Promise<PeersEntity | null> {
-        return await this.#peersRepository.findOne({ where : { ip_address: ip } });
+        return await this.repository.findOne({ where : { ip_address: ip } });
     }
 
 }   
