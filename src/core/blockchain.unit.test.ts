@@ -3,6 +3,7 @@ import { Blockchain } from "./blockchain";
 
 import { Block as blockResource} from "@database/entities/block.entity";
 import { Block } from "./block";
+import { generateRandomMacAddress } from "@utils/generate";
 
 describe("Core Blockchain", () => {
 
@@ -79,12 +80,6 @@ describe("Core Blockchain", () => {
 
     })
 })
-
-function generateRandomMacAddress() {
-    return "XX:XX:XX:XX:XX:XX".replace(/X/g, function() {
-        return "0123456789ABCDEF".charAt(Math.floor(Math.random() * 16))
-      });
-}
 
 function getChainDump() {
     return [
