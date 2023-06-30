@@ -18,12 +18,16 @@ export class Strategy {
         return true;
     }
 
-    async create(block: any) {
-        return await this.repository.insert(block);
+    async create(resource: any) {
+        return await this.repository.insert(resource);
     }
 
     async findById(id: number) : Promise<any | null> {
         return await this.repository.findOne({ where: { id } });
+    }
+
+    async find(where: object) : Promise<any | null> {
+        return await this.repository.findOne({ where });
     }
 
     async getAll(where: object) {
@@ -34,11 +38,15 @@ export class Strategy {
         return await this.repository.findOne({ where: {}});
     }
 
+    async last() : Promise<any | null> {
+        return await this.repository.findOne({ where: {}, order: { id : "DESC" } });
+    }
+
     async countRows(where: object) {
         return await this.repository.count({ where });
     }
 
-    async truncateTests(){
+    async truncate(){
         return await this.repository.clear();
     }
 }   
