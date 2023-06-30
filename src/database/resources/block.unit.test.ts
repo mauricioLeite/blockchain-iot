@@ -23,11 +23,12 @@ describe("resource Block", () => {
             expect(result).toBe(true);
         })
 
+        // ! Escape to generate genesis block
         //  Create new resource on Database - use carefully    
-        it("should create a block", async () => {
-            const result = await instance.create(blockEntity as BlockEntity);
-            expect(result).toBeInstanceOf(InsertResult);
-        })
+        // it("should create a block", async () => {
+        //     const result = await instance.create(blockEntity as BlockEntity);
+        //     expect(result).toBeInstanceOf(InsertResult);
+        // })
 
         // ! Breaks on truncate for now
         // it("should recover entry with ID 1", async () => {
