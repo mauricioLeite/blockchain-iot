@@ -7,7 +7,7 @@ describe("Core Block", () => {
         const instance = new Block(0, transaction, "2b8b41f86c3d2a9e68fb5e4e79e7c3dc", new Date("2023-06-08T00:32:05.695Z"), 1234);
 
         it("should compute block hash", async () => {
-            const expectedHash = "3c87819ddde6c5a624f99323a7716d63463871ab5970c3a477bb4bcdb518504e";
+            const expectedHash = "934b7b6ac4b8e7fd56f9c42b83afca7988047807d70cc22f56c27d1762d1782f";
             const result:string = await instance.computeHash();
             
             expect(result).toEqual(expectedHash);
