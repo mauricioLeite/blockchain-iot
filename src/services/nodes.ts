@@ -73,7 +73,7 @@ export class Nodes {
     */
     public async syncBlock(block: Block) {
         const proof = block.hash;
-        delete block.index;
+        delete block.id;
         delete block.hash;
         delete block.createdAt;
 
