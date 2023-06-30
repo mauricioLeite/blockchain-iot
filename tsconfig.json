@@ -39,6 +39,12 @@
 			],
 			"@core/*": [
 				"core/*"
+			],
+			"@utils": [
+				"utils"
+			],
+			"@utils/*": [
+				"utils/*"
 			]
 		}
 	},

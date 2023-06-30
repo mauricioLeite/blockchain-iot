@@ -39,6 +39,8 @@
 		"@database": "dist/database",
 		"@database/*": "dist/database/*",
 		"@core": "dist/core",
-		"@core/*": "dist/core/*"
+		"@core/*": "dist/core/*",
+		"@utils": "dist/utils",
+		"@utils/*": "dist/utils/*"
 	}
 }
