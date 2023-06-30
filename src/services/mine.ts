@@ -1,7 +1,7 @@
 import { Block } from "../core/block";
 
 import { Axios } from 'axios';
-export class MineService {
+export class Mine {
     storage: any
     library: any
 
