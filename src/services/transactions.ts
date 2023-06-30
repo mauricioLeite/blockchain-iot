@@ -3,13 +3,13 @@ import { DatabaseResourceFactory } from "@database";
 export class Transactions {
     #storage: DatabaseResourceFactory
 
-    constructor(storage: any) {
+    constructor(storage: DatabaseResourceFactory) {
         this.#storage = storage
     }
 
     async create (payload: any) {
         const transactionModel = await this.#storage.createPendingTransactionsResource();
-        const inserted = await transactionModel.create({ transaction: payload });
+        const inserted = await transactionModel.create({ transaction_data: JSON.stringify(payload) });
         
         if (inserted)   return { message: "Transaction requested!", status: 201 };
         return { message: "Internal Error", status: 500 };
