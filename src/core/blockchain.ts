@@ -1,87 +1,94 @@
+import { DatabaseResourceFactory } from "@database";
 import { Block } from "./block"
 
 export class Blockchain {
     //TODO: ainda vai ser injetado, mudar a tipagem para o tipo do adaptador
-    storage: any
-    difficulty = 2
-    constructor(_storage: any) {
-        this.storage = _storage
-        this.#createGenesisBlock()
+    #storage: DatabaseResourceFactory
+    #difficulty = 2
+    constructor(_storage: DatabaseResourceFactory) {
+        this.#storage = _storage
     }
 
-    #createGenesisBlock(reference: Block | null = null) {
-        //TODO: mudar a tipagem do blocksModel
-        const blocksModel: any = this.storage.createBlockModels()
-        if (blocksModel.countRows() == 0) {
+    async init() {
+        await this.#createGenesisBlock();
+        return true;
+    }
+
+    async #createGenesisBlock(reference: Block | null = null) {
+        const blocksModel: any = await this.#storage.createBlockResource();
+        if (await blocksModel.countRows() == 0) {
             let genesisBlock: Block;
             if (!reference) {
                 genesisBlock = new Block(0, [], "0", new Date())
-                genesisBlock.hash = genesisBlock.computeHash()
+                genesisBlock.hash = this.proofOfWork(genesisBlock);
             } else {
-                delete reference.index
-                //TODO: validar se isso está certo e se funciona
-                genesisBlock = reference
+                genesisBlock = reference;
             }
-            this.storage.createBlockModels().insert(genesisBlock)
+
+            await blocksModel.create(genesisBlock.databaseFormat())
         }
     }
 
-    chain() {
-        return this.storage.createBlockModels().getAll()
+    async chain(): Promise<Block[]> {
+        const blocksModel: any = await this.#storage.createBlockResource();
+        return await blocksModel.getAll();
     }
 
-    lastBlock() {
-        return this.storage.createBlockModels().last()
+    async lastBlock() : Promise<Block> {
+        const blocksModel: any = await this.#storage.createBlockResource();
+        return await blocksModel.last();
     }
 
-    getBlock(_id: number) {
-        const block = this.storage.createBlockModels().get({ id: _id })
-        return block ? block : {}
+    async getBlock(id: number) {
+        const blocksModel: any = await this.#storage.createBlockResource();
+        return await blocksModel.find({ "index": id });
     }
 
-    mine(unconfirmedTransaction: any) {
-        const lastBlock = this.lastBlock()
+    async mine(unconfirmedTransaction: any) {
+        const lastBlock = await this.lastBlock();
         const newBlock = new Block(
             lastBlock.index + 1,
             unconfirmedTransaction.transaction,
-            lastBlock.hash
+            lastBlock.hash!
         )
         const proof = this.proofOfWork(newBlock)
-        const id = this.addBlock(newBlock, proof)
-        return id
+        return await this.addBlock(newBlock, proof);
     }
 
     proofOfWork(block: Block) {
         block.nonce = 0
         let computedHash = block.computeHash()
-        //TODO: Update conditional to follow startsWith validation
-        while (!computedHash.startsWith(this.difficulty.toString())) {
+        while (!computedHash.startsWith("0".repeat(this.#difficulty))) {
             block.nonce += 1
             computedHash = block.computeHash()
         }
+
         return computedHash
     }
 
-    addBlock(block: Block, proof: string) {
-        const previousHash = this.lastBlock().hash
+    async addBlock(block: Block, proof: string) {
+        const lastBlock = await this.lastBlock();
+        const previousHash = lastBlock.hash;
         if (previousHash !== block.previousHash) return false
         if (!this.isValidProof(block, proof)) return false
         block.hash = proof
-        //TODO: Validate if insert return inserted element id
-        return this.storage.createBlockModels().insert(block)
+
+        const blocksModel: any = await this.#storage.createBlockResource();
+        const blockId = await blocksModel.create(block.databaseFormat());
+        return blockId.raw;
     }
 
     isValidProof(block: Block, blockHash: string) {
         return (
-            //TODO: Update check to follow startsWith validation
-            blockHash.startsWith(this.difficulty.toString()) &&
+            blockHash.startsWith("0".repeat(this.#difficulty)) &&
             blockHash === block.computeHash()
         )
     }
 
     // Blockchain Consensus Logic Methods
-    checkChainValidity(chain: any[]) {
-        let previousHash = this.getBlock(0).hash;
+    async checkChainValidity(chain: any[]) {
+        const genesisBlock = await this.getBlock(0);
+        let previousHash = genesisBlock.hash;
         for (const block of chain) {
             if (block.index == 0) continue;
             const blockHash = block.hash
@@ -91,21 +98,12 @@ export class Blockchain {
             delete block.hash
             delete block.createdAt
 
-            if (
-                !this.isValidProof(
-                    new Block(
-                        block.index,
-                        block.transaction,
-                        block.previousHash,
-                        block.createdAt,
-                        block.nonce,
-                        block.hash
-                    ),
-                    blockHash
-                ) ||
-                previousHash !== block.previousHash
-            )
+            const actualBlock =  new Block(block.index, block.transaction, block.previous_hash);
+            actualBlock.nonce = block.nonce;
+            
+            if ( !this.isValidProof(actualBlock , blockHash) || previousHash !== actualBlock.previousHash )
                 return false
+
             block.hash = blockHash;
             previousHash = blockHash;
             
@@ -113,27 +111,28 @@ export class Blockchain {
         return true
     }
 
-    createChainFromDump(chainDump: any[]) {
-        this.storage.createBlockModels().delete()
-        chainDump.forEach((blockData) => {
+    async createChainFromDump(chainDump: any[]) {
+        const blocksModel: any = await this.#storage.createBlockResource();
+        await blocksModel.truncate();
+        for (const blockData of chainDump) {
             if (blockData.index === 0) {
-                this.#createGenesisBlock(blockData)
+                delete blockData.id;
+                const refereceBlock = Block.createFromObject(blockData);
+                await this.#createGenesisBlock(refereceBlock);
             } else {
                 const proof = blockData.hash
+
                 delete blockData.id
                 delete blockData.hash
-                delete blockData.createdAt
-                const block = new Block(
-                    blockData.index,
-                    blockData.transaction,
-                    blockData.previousHash,
-                    blockData.createdAt,
-                    blockData.nonce,
-                )
-                const added = this.addBlock(block, proof)
+                delete blockData.created_at
+                
+                const refereceBlock = new Block(blockData.index, blockData.transaction, blockData.previous_hash);
+                refereceBlock.nonce = blockData.nonce;
+                
+                const added = await this.addBlock(refereceBlock, proof)
                 if (!added) console.log("The chain dump is tampered!!")
             }
-        })
+        }
         return this.chain()
     }
 }
