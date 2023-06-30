@@ -5,7 +5,7 @@ import { Block } from "./../core/block";
 import { Axios } from 'axios';
 
 // Classe que lida com comunicação e armazenamento de dados relacionados à blockchain
-export class NodeService {
+export class Nodes {
 
     #storage: any;
     #library: any;
