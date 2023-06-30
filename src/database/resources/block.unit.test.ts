@@ -1,20 +1,20 @@
 import { Block } from "./block"
-import { Block as BlockEntity } from "../entities/block.entity";
 import { DatabaseConnector } from "../DatabaseConnector";
-import { InsertResult } from "typeorm";
+// import { Block as BlockEntity } from "../entities/block.entity";
+// import { InsertResult } from "typeorm";
 
 describe("resource Block", () => {
 
     describe("#init", () => {
         const instance = new Block(new DatabaseConnector());
 
-        const blockEntity = { 
-            index : 0,
-            transaction : '{data: "test"}',
-            previous_hash : 'k20skc=d120k1+e',
-            nonce : 5,
-            hash : 'jo2mfdm0d,d-d=d3'
-        };
+        // const blockEntity = { 
+        //     index : 0,
+        //     transaction : '{data: "test"}',
+        //     previous_hash : 'k20skc=d120k1+e',
+        //     nonce : 5,
+        //     hash : 'jo2mfdm0d,d-d=d3'
+        // };
 
         it("should init", async () => {
             const result = await instance.init();
