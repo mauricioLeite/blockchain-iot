@@ -34,7 +34,7 @@ export class Strategy {
         return await this.repository.find({ where });
     }
     
-    async next() : Promise<any | null> {
+    async first() : Promise<any | null> {
         return await this.repository.findOne({ where: {}});
     }
 

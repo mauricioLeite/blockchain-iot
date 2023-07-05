@@ -15,7 +15,7 @@ export class Blockchain {
     }
 
     async #createGenesisBlock(reference: Block | null = null) {
-        const blocksModel: any = await this.#storage.createBlockResource();
+        const blocksModel: any = await this.#storage.createDevicesResource();
         if (await blocksModel.countRows() == 0) {
             let genesisBlock: Block;
             if (!reference) {
@@ -30,17 +30,17 @@ export class Blockchain {
     }
 
     async chain(): Promise<Block[]> {
-        const blocksModel: any = await this.#storage.createBlockResource();
+        const blocksModel: any = await this.#storage.createDevicesResource();
         return await blocksModel.getAll();
     }
 
     async lastBlock() : Promise<Block> {
-        const blocksModel: any = await this.#storage.createBlockResource();
+        const blocksModel: any = await this.#storage.createDevicesResource();
         return await blocksModel.last();
     }
 
     async getBlock(id: number) {
-        const blocksModel: any = await this.#storage.createBlockResource();
+        const blocksModel: any = await this.#storage.createDevicesResource();
         return await blocksModel.find({ "index": id });
     }
 
@@ -73,7 +73,7 @@ export class Blockchain {
         if (!this.isValidProof(block, proof)) return false
         block.hash = proof
 
-        const blocksModel: any = await this.#storage.createBlockResource();
+        const blocksModel: any = await this.#storage.createDevicesResource();
         const blockId = await blocksModel.create(block.databaseFormat());
         return blockId.raw;
     }
@@ -112,7 +112,7 @@ export class Blockchain {
     }
 
     async createChainFromDump(chainDump: any[]) {
-        const blocksModel: any = await this.#storage.createBlockResource();
+        const blocksModel: any = await this.#storage.createDevicesResource();
         await blocksModel.truncate();
         for (const blockData of chainDump) {
             if (blockData.index === 0) {

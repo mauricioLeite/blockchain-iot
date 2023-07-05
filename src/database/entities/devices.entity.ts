@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 
 @Entity()
-export class Block {
+export class Devices {
     @PrimaryGeneratedColumn()
     id: number;
 

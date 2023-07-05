@@ -1,4 +1,4 @@
-import { Block } from "./block";
+import { Devices } from "./devices";
 import { PendingTransactions } from "./pending_transactions";
 import { Peers } from "./peers";
 
@@ -11,8 +11,8 @@ export class DatabaseResourceFactory {
         this.#databaseConnector = databaseConnector ?? new DatabaseConnector();
     }
 
-    async createBlockResource() {
-        return await this.#initializeResource(Block);
+    async createDevicesResource() {
+        return await this.#initializeResource(Devices);
     }
 
     async createPeersResource() {

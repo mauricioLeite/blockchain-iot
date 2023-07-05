@@ -26,7 +26,7 @@ describe("resource Peers", () => {
         })
 
         it("should recover next pending transaction", async () => {
-            const result = await instance.next();
+            const result = await instance.first();
 
             expect(result).toBeInstanceOf(PendingTransactionsEntity);
             expect(result?.transaction_data).toEqual(pendingTransactionsData.transaction_data);

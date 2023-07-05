@@ -1,7 +1,7 @@
 import { DatabaseResourceFactory } from "@database";
 import { Blockchain } from "./blockchain";
 
-import { Block as blockResource} from "@database/entities/block.entity";
+import { Devices as DevicesResource} from "@database/entities/devices.entity";
 import { Block } from "./block";
 import { generateRandomMacAddress } from "@utils/generate";
 
@@ -24,12 +24,12 @@ describe("Core Blockchain", () => {
         it("should return last chain block", async () => {
             const result = await instance.lastBlock();
             lastBlock = result;
-            expect(result).toBeInstanceOf(blockResource);
+            expect(result).toBeInstanceOf(DevicesResource);
         })
 
         it("should return specific chain block", async () => {
             const result = await instance.getBlock(0);
-            expect(result).toBeInstanceOf(blockResource);
+            expect(result).toBeInstanceOf(DevicesResource);
         })
 
         it("should mine new block", async () => {

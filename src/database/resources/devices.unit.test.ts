@@ -1,12 +1,12 @@
-import { Block } from "./block"
+import { Devices } from "./devices"
 import { DatabaseConnector } from "../DatabaseConnector";
 // import { Block as BlockEntity } from "../entities/block.entity";
 // import { InsertResult } from "typeorm";
 
-describe("resource Block", () => {
+describe("resource Devices", () => {
 
     describe("#init", () => {
-        const instance = new Block(new DatabaseConnector());
+        const instance = new Devices(new DatabaseConnector());
 
         // const blockEntity = { 
         //     index : 0,

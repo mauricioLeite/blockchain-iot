@@ -1,12 +1,12 @@
-import { Block as BlockEntity } from "../entities/block.entity";
+import { Devices as DevicesEntity } from "../entities/devices.entity";
 import { DatabaseConnector } from "../DatabaseConnector";
 import { Strategy } from "./strategy";
 
-export class Block extends Strategy {
+export class Devices extends Strategy {
 
     constructor(databaseConnector: DatabaseConnector) {
         super(databaseConnector);
-        this.entity = BlockEntity;
+        this.entity = DevicesEntity;
     }
 
 }   
