@@ -22,6 +22,11 @@ export class Strategy {
         return await this.repository.insert(resource);
     }
 
+    async deleteById(id: number) {
+        const result = await this.repository.delete(id);
+        return result.affected;
+    }
+
     async findById(id: number) : Promise<any | null> {
         return await this.repository.findOne({ where: { id } });
     }
@@ -30,7 +35,8 @@ export class Strategy {
         return await this.repository.findOne({ where });
     }
 
-    async getAll(where: object) {
+    async getAll(where: object | null = null) {
+        if (! where ) where = {};
         return await this.repository.find({ where });
     }
     
