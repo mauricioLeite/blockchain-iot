@@ -33,6 +33,18 @@
 			],
 			"@database/*": [
 				"database/*"
+			],
+			"@core": [
+				"core"
+			],
+			"@core/*": [
+				"core/*"
+			],
+			"@utils": [
+				"utils"
+			],
+			"@utils/*": [
+				"utils/*"
 			]
 		}
 	},

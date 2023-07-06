@@ -1,24 +1,20 @@
-import { request } from "https";
-import { Block } from "../core/block";
-export class MineService {
-    storage: any
-    library: any
+import { DatabaseResourceFactory } from "@database";
+import { Block, Blockchain } from "@core";
 
-    constructor(
-        storage: any,
-        library: any
-    ) {
-        this.storage = storage
-        this.library = library
+import { Axios } from 'axios';
+export class Mine {
+    #storage: DatabaseResourceFactory
+
+    constructor( storage: DatabaseResourceFactory ) {
+        this.#storage = storage;
     }
 
     /*
     Mineração de blocos
   */
-    mine() {
-        const transaction = this.storage
-            .createPendingTransactionsModel()
-            .first()
+    async mine() {
+        const transactionsModel = await this.#storage.createPendingTransactionsResource();
+        const transaction = transactionsModel.first();
         if (!transaction) {
             return {
                 message: "No transaction available.",
@@ -26,8 +22,8 @@ export class MineService {
             }
         }
 
-        const blockchain = this.library.createBlockchain()
-        const minedBlockId = blockchain.mine(transaction)
+        const blockchain = new Blockchain(this.#storage);
+        const minedBlockId = await blockchain.mine(transaction);
         if (!minedBlockId) {
             return {
                 message: "Error on mining process.",
@@ -36,16 +32,17 @@ export class MineService {
         }
 
         const chainLength = blockchain.chain.length
-        this.consensus()
+        await this.consensus();
+        const lastBlock = await blockchain.lastBlock();
         if (chainLength === blockchain.chain.length) {
-            this.announceNewBlock(blockchain.lastBlock)
-            this.storage
-                .createPendingTransactionsModel()
-                .delete({ id: transaction.id })
+            await this.announceNewBlock(lastBlock);
+
+            const transactionModel = await this.#storage.createPendingTransactionsResource();
+            transactionModel.deleteById(transaction.id);
         }
 
         return {
-            block: blockchain.lastBlock,
+            block: lastBlock,
             status: 200,
         }
     }
@@ -53,24 +50,30 @@ export class MineService {
     /*
     Alcançar o consenso entre os pares da rede
   */
-    consensus() {
-        let longestChain = null
-        let currentLen = this.library.createBlockchain().chain.length
-        const peers = this.storage.createPeersModel().getAll()
+    async consensus() {
+        const blockchain = new Blockchain(this.#storage);
+        const peersModel = await this.#storage.createPeersResource();
+        let longestChain = null;
+
+        let currentLen = (await blockchain.chain()).length;
+        const peers = peersModel.getAll();
         for (const node of peers) {
-            const response = request.get(`http://${node.ip_address}/registry`)
-            const length = response.json().length
-            const chain = response.json().chain
-            if (
-                length > currentLen &&
-                this.library.createBlockchain().checkChainValidity(chain)
-            ) {
+            const options = {
+                method: 'GET',
+                url: `http://${node.ip_address}/registry`, 
+            };
+
+            const client = new Axios()
+            const response = await client.request(options);
+            const length = response.data.length
+            const chain = response.data.chain
+            if ( length > currentLen && await blockchain.checkChainValidity(chain) ) {
                 currentLen = length
                 longestChain = chain
             }
         }
         if (longestChain) {
-            this.library.createBlockchain().createChainFromDump(longestChain)
+            await blockchain.createChainFromDump(longestChain);
         }
 		return
     }
@@ -78,13 +81,30 @@ export class MineService {
     /*
     Anunciar a inclusão de um novo bloco aos pares da rede
   */
-    announceNewBlock(block: Block) {
-        if ("createdAt" in block) delete block.createdAt
-        const peers = this.storage.createPeersModel().getAll()
+    async announceNewBlock(block: Block) {
+        for (const key of Object.keys(block)) {
+            if (!['index','transaction','nonce','previous_hash', 'hash'].includes(key)) delete block[key as keyof Block];
+        }
+
+        const peersModel = await this.#storage.createPeersResource();
+        const peers = peersModel.getAll();
+
+        const options: ClientOptions = {
+            method: 'POST',
+            params: { json: JSON.stringify(block) },
+        };
+        const client = new Axios()
+        
         for (const node of peers) {
-            request.post(`http://${node.ip_address}/node/sync_block`, {
-                json: JSON.stringify(block),
-            })
+            options.url = `http://${node.ip_address}/node/sync_block`;
+            await client.request(options); 
         }
     }
+}
+
+interface ClientOptions {
+    method: string,
+    url?: string,
+    params?: object,
+    headers?: object
 }

@@ -1,21 +1,18 @@
+import { DatabaseResourceFactory } from "@database"
+import { Blockchain, Peers } from "@core";
 export class Registry {
-    storage: any
-    library: any
+    #storage: DatabaseResourceFactory
 
-    constructor(_storage: any, _library: any) {
-        this.storage = _storage
-        this.library = _library
+    constructor(storage: DatabaseResourceFactory) {
+        this.#storage = storage
     }
 
-    list(id: string | number | undefined = undefined) {
-        const peers = this.library.createPeersManager().list()
-        const blockchain = this.library.createBlockchain()
-        let chain
-        if (id) {
-            chain = blockchain.getBlock(id)
-        } else {
-            chain = blockchain.chain
-        }
+    async list() {
+        const blockchain = new Blockchain(this.#storage);
+        const peersInstance = new Peers(this.#storage);
+        const peers = await peersInstance.list();
+        const chain = await blockchain.chain();
+
         return { chain: chain, peers: peers, length: chain.length, status: 200 }
     }
 }

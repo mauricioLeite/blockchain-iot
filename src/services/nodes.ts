@@ -1,55 +1,67 @@
+import { DatabaseResourceFactory } from '@database';
+import { Block, Blockchain, Peers } from '@core';
 import { Registry } from './registry';
-import { Block } from "./../core/block";
 
 // Use another request library
-import { request } from 'https';
+import { Axios } from 'axios';
 
 // Classe que lida com comunicação e armazenamento de dados relacionados à blockchain
-export class NodeService {
+export class Nodes {
+    #storage: DatabaseResourceFactory;
 
-    private storage: any;
-    private library: any;
-
-    constructor(storage: any, library: any) {
-        this.storage = storage;
-        this.library = library;
+    constructor(storage: DatabaseResourceFactory) {
+        this.#storage = storage;
     }
 
     /*
     Verifica se o endereço do novo nó está presente e, em caso afirmativo, adiciona o novo nó ao armazenamento de pares (peers) e retorna a lista de pares atualizada
     */
-    public async newNode(payload: { node_address: string }) {
-        const addr = payload.node_address;
+    public async newNode(payload: newAddress) {
+        const newNodeAddr = payload.nodeAddress;
+        
+        if (!newNodeAddr) return { message: 'Missing nodeAddress field!' , status: 401 };
+        
+        const instance = new Registry(this.#storage);
+        const networkNodes = (await instance.list()).peers;
+        
+        if (networkNodes.includes(newNodeAddr)) return { message: 'Address already registered!' , status: 409 };
 
-        if (!addr) {
-            return { message: 'Missing node_address field!' , status: 401 };
-        }
+        const peerModel = await this.#storage.createPeersResource();
+        await peerModel.create({ ip_address: newNodeAddr });
 
-        //TODO: check if node exist before insert and communicate new nodes to peers
-        this.storage.createPeersModel().insert({ ip_address: addr });
-        return new Registry(this.storage, this.library).list();
+        const actualNetworkNodes = (await instance.list()).peers;
+        return { "message": "Registered successfully!", status: 201, networkNodes: actualNetworkNodes };
     }
 
     /*
     Verifica se o endereço do novo nó está presente e, em caso afirmativo, envia uma solicitação POST para o endereço especificado para registrar o novo nó
     */
     public async joinNetwork(payload: { node_address: string }, host: string) {
-        const addr = payload.node_address;
+        const nodeAddr = payload.node_address;
 
-        if (!addr) {
+        if (!nodeAddr) {
             return { message: 'Missing node_address field!' , status: 401};
         }
 
         const data = { node_address: host };
         const headers = { 'Content-Type': 'application/json' };
 
-        const response = await request.post(
-            `http://${addr}/node/register`, { data, headers });
+        const options = {
+            method: 'POST',
+            url: `http://${nodeAddr}/node/register`,
+            params: data,
+            headers: headers 
+        };
 
-        if (response.statusCode === 200) {
-            const responsePayload = response.json();
-            this.library.createBlockchain().createChainFromDump(responsePayload.chain);
-            this.library.createPeersManager().syncPeers([addr, ...responsePayload.peers], host);
+        const client = new Axios()
+        const response = await client.request(options);
+        
+        if (response.status === 200) {
+            const responsePayload = response.data;
+            const blockchain = new Blockchain(this.#storage);
+            const peers = new Peers(this.#storage);
+            blockchain.createChainFromDump(responsePayload.chain);
+            peers.syncPeers([nodeAddr, ...responsePayload.peers], host);
             return { message: 'Registration successful' , status: 200};
         } else {
             return { message: 'Error registering node in network.' , status: 500};
@@ -61,15 +73,12 @@ export class NodeService {
     */
     public async syncBlock(block: Block) {
         const proof = block.hash;
-        delete block.index;
         delete block.hash;
-        delete block.createdAt;
 
-        const added = this.library.createBlockchain().addBlock(block, proof);
+        const blockchain = new Blockchain(this.#storage);
+        const added = blockchain.addBlock(block, proof!);
 
-        if (!added) {
-            return { message: 'The block is discarded by the node.' , status: 500};
-        }
+        if (!added) return { message: 'The block is discarded by the node.' , status: 500};
 
         return { message: 'Block added to the chain' , status:  201};
     }
@@ -78,8 +87,16 @@ export class NodeService {
      Limpa o armazenamento local de pares e blocos
     */
     public async clearLocal() {
-        this.storage.createPeersModel().delete();
-        this.storage.createBlockModels().delete();
+        const peersModel = await this.#storage.createPeersResource();
+        const blockModel = await this.#storage.createDevicesResource();
+        
+        peersModel.truncate();
+        blockModel.truncate();
+
         return { message: 'Clear complete!' , status: 200};
     }
 }
+
+interface newAddress {
+    nodeAddress: string
+}       
