@@ -1,6 +1,6 @@
 import { DatabaseResourceFactory } from '@database';
 import { Block, Blockchain, Peers } from '@core';
-import { Registry } from './registry';
+import { Registry } from '../registry/registry';
 
 // Use another request library
 import { Axios } from 'axios';
