@@ -3,7 +3,7 @@ import { PendingTransactions as PendingTransactionsEntity } from "../entities/pe
 import { DatabaseConnector } from "../DatabaseConnector";
 import { InsertResult } from "typeorm";
 
-describe("resource Peers", () => {
+describe("resource Transactions", () => {
 
     describe("#init", () => {
         const instance = new PendingTransactions(new DatabaseConnector());
@@ -31,6 +31,11 @@ describe("resource Peers", () => {
             expect(result).toBeInstanceOf(PendingTransactionsEntity);
             expect(result?.transaction_data).toEqual(pendingTransactionsData.transaction_data);
 
+        });
+
+        it("should delete a transaction by Id", async () => {
+            const result = await instance.deleteById(20);
+            expect(typeof result).toBe("number");
         });
     })
 })
