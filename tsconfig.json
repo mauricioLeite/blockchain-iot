@@ -45,6 +45,12 @@
 			],
 			"@utils/*": [
 				"utils/*"
+			],
+			"@services": [
+				"services"
+			],
+			"@services/*": [
+				"services/*"
 			]
 		}
 	},
