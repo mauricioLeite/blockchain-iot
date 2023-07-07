@@ -1,13 +1,4 @@
 version: '3.9'
-
-# networks:
-#   blockchain-iot:
-#     driver: bridge
-#     attachable: true
-#     ipam:
-#       config:
-#         - subnet: 186.10.0.0/23
-
 services:
   blockchain-iot:
     build: 
@@ -34,21 +25,3 @@ services:
       - "3000:3000"
     restart: unless-stopped
     container_name: blockchain-iot
-    # depends_on:
-    #   - postgres
-
-  # postgres:
-  #   container_name: postgres
-  #   image: postgres:14.5-bullseye
-  #   ports:
-  #     - 5432:5432
-  #   environment:
-  #     POSTGRES_USER: postuser
-  #     POSTGRES_PASSWORD: postpw
-  #     POSTGRES_DB: koclouds
-  #     PGDATA: /data/postgres
-  #   restart: always
-  #   networks:
-  #     - blockchain-iot
-  #   volumes:
-  #     - ./postgres/:/data/postgres
