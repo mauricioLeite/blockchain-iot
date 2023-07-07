@@ -1,18 +1,10 @@
-import { Nodes  } from "./nodes";
+import { Nodes  } from "./nodes.service";
 import { DatabaseResourceFactory } from "@database";
 
 describe("Nodes Service", () => {
 
     describe("#init", () => {
         const instance: Nodes = new Nodes(new DatabaseResourceFactory());
-        
-
-        it("should clear registry blocks and peers", async () => {
-            const result = await instance.clearLocal();
-            expect(result).toHaveProperty('status');
-            expect(result.status).toBe(200);
-            expect(result).toHaveProperty('message');
-        })
 
         it("should add a new node to network", async () => {
             const payload = { nodeAddress: "123.456.789.101"};

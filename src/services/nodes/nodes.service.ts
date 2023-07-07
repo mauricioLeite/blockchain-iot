@@ -1,6 +1,6 @@
 import { DatabaseResourceFactory } from '@database';
 import { Block, Blockchain, Peers } from '@core';
-import { Registry } from '../registry/registry';
+import { Registry } from '../registry/registry.service';
 
 // Use another request library
 import { Axios } from 'axios';
@@ -83,18 +83,6 @@ export class Nodes {
         return { message: 'Block added to the chain' , status:  201};
     }
 
-    /*
-     Limpa o armazenamento local de pares e blocos
-    */
-    public async clearLocal() {
-        const peersModel = await this.#storage.createPeersResource();
-        const blockModel = await this.#storage.createDevicesResource();
-        
-        peersModel.truncate();
-        blockModel.truncate();
-
-        return { message: 'Clear complete!' , status: 200};
-    }
 }
 
 interface newAddress {
