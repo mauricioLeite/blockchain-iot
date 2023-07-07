@@ -1,4 +1,4 @@
-import { Registry  } from "./registry";
+import { Registry } from "./registry.service";
 import { DatabaseResourceFactory } from "@database";
 
 describe("Registry Service", () => {

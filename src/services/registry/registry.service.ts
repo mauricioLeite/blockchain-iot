@@ -15,4 +15,17 @@ export class Registry {
 
         return { chain: chain, peers: peers, length: chain.length, status: 200 }
     }
+
+    /*
+     Limpa o armazenamento local de pares e blocos
+    */
+     public async clearLocal() {
+        const peersModel = await this.#storage.createPeersResource();
+        const blockModel = await this.#storage.createDevicesResource();
+        
+        peersModel.truncate();
+        blockModel.truncate();
+
+        return { message: 'Clear complete!' , status: 200};
+    }
 }
