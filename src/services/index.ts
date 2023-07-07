@@ -1,4 +1,4 @@
-export { Mine as MineService } from "./mine/mine";
-export { Nodes as NodesService } from "./nodes/nodes";
-export { Registry as RegistryService } from "./registry/registry";
-export { Transactions as TransactionService } from "./transactions/transactions";
+export { MineController } from "./mine";
+export { NodesController } from "./nodes";
+export { RegistryController } from "./registry";
+export { TransactionsController } from "./transactions";
