@@ -1,0 +1,1 @@
+export { RegistryController } from './registry.controller';
