@@ -39,7 +39,7 @@ export class Nodes {
 
         const data = { node_address: host };
         const headers = { 'Content-Type': 'application/json' };
-        const client = new HTTPRequest(`http://${nodeAddr}:3000`)
+        const client = new HTTPRequest(`http://${nodeAddr}`)
         const response = await client.post(`/nodes/register`, data, { headers });
 
 
