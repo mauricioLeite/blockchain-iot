@@ -1,13 +1,15 @@
 import { DatabaseResourceFactory } from '@database';
-import { Block, Blockchain, Peers } from '@core';
+import { CoreFactory } from '@core';
 
 import { HTTPRequest } from '@utils';
 
 export class Nodes {
     #storage: DatabaseResourceFactory;
+    #core: CoreFactory
 
-    constructor(storage: DatabaseResourceFactory) {
+    constructor(storage: DatabaseResourceFactory, core: CoreFactory) {
         this.#storage = storage;
+        this.#core = core;
     }
 
     async newNode(payload: newAddress) {
@@ -23,7 +25,8 @@ export class Nodes {
         await peerModel.create({ ip_address: newNodeAddr });
 
         networkNodes = await this.#listPeers();
-        const chain = await new Blockchain(this.#storage).chain();
+        const blockchain = await this.#core.createBlockchain();
+        const chain = await blockchain.chain();
         return { response: { message: "Registered successfully!", networkNodes, chain }, status: 201};
     }
 
@@ -42,8 +45,8 @@ export class Nodes {
 
         if (response.status === 201) {
             const { chain, networkNodes } = response.data;
-            const blockchain = new Blockchain(this.#storage);
-            const peers = new Peers(this.#storage);
+            const blockchain = await this.#core.createBlockchain();
+            const peers = await this.#core.createPeers();
             blockchain.createChainFromDump(chain);
             peers.syncPeers([nodeAddr, ...networkNodes], host);
             return { response: { message: 'Registration successful'}, status: 200};
@@ -52,11 +55,11 @@ export class Nodes {
         }
     }
 
-    async syncBlock(block: Block) {
+    async syncBlock(block: any) {
         const proof = block.hash;
         delete block.hash;
 
-        const blockchain = new Blockchain(this.#storage);
+        const blockchain = await this.#core.createBlockchain();
         const added = blockchain.addBlock(block, proof!);
 
         if (!added) return { message: 'The block is discarded by the node.' , status: 500};
@@ -65,7 +68,7 @@ export class Nodes {
     }
 
     async #listPeers() {
-        const peersInstance = new Peers(this.#storage);
+        const peersInstance = await this.#core.createPeers();
         return await peersInstance.list();
     }   
 
