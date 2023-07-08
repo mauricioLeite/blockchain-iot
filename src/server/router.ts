@@ -15,6 +15,10 @@ router.get("/", function (_req: Request, res: Response) {
     });
 });
 
+//  Nodes Service routes
+router.post("/nodes/register", nodes.post_register);
+router.post("/nodes/join", nodes.post_join);
+
 //  Registry Service routes
 router.get("/registry", registry.get);
 router.delete("/registry", registry.delete);
