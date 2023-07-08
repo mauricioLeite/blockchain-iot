@@ -1,7 +1,7 @@
 import { DatabaseResourceFactory } from '@database';
 import { Block, Blockchain, Peers } from '@core';
 
-import { Axios } from 'axios';
+import axios from 'axios';
 
 export class Nodes {
     #storage: DatabaseResourceFactory;
@@ -15,18 +15,19 @@ export class Nodes {
         
         if (!newNodeAddr) return { message: 'Missing nodeAddress field!' , status: 401 };
 
-        const networkNodes = await this.#listPeers();
+        let networkNodes = await this.#listPeers();
         
         if (networkNodes.includes(newNodeAddr)) return { message: 'Address already registered!' , status: 409 };
 
         const peerModel = await this.#storage.createPeersResource();
         await peerModel.create({ ip_address: newNodeAddr });
 
-        const actualNetworkNodes = await this.#listPeers();
-        return { response: { message: "Registered successfully!", networkNodes: actualNetworkNodes }, status: 201};
+        networkNodes = await this.#listPeers();
+        const chain = await new Blockchain(this.#storage).chain();
+        return { response: { message: "Registered successfully!", networkNodes, chain }, status: 201};
     }
 
-    async joinNetwork(payload: newAddress, host: string) {
+    async joinNetwork(payload: { node_address: string }, host: string) {
         const nodeAddr = payload.node_address;
 
         if (!nodeAddr) {
@@ -37,22 +38,21 @@ export class Nodes {
         const headers = { 'Content-Type': 'application/json' };
 
         const options = {
+            baseURL: `http://${nodeAddr}:3000`, 
+            url: `/nodes/register`,
             method: 'POST',
-            url: `http://${nodeAddr}/node/register`,
-            params: data,
+            data,
             headers: headers 
         };
-        console.log(data, headers, options);
-        const client = new Axios()
-        const response = await client.request(options);
-        console.log("failed");
-        
-        if (response.status === 200) {
-            const responsePayload = response.data;
+
+        const response = await axios.request(options);
+
+        if (response.status === 201) {
+            const { chain, networkNodes } = response.data;
             const blockchain = new Blockchain(this.#storage);
             const peers = new Peers(this.#storage);
-            blockchain.createChainFromDump(responsePayload.chain);
-            peers.syncPeers([nodeAddr, ...responsePayload.peers], host);
+            blockchain.createChainFromDump(chain);
+            peers.syncPeers([nodeAddr, ...networkNodes], host);
             return { response: { message: 'Registration successful'}, status: 200};
         } else {
             return { response: { message: 'Error registering node in network.'}, status: 500};
