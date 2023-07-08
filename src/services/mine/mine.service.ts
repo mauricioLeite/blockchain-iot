@@ -31,7 +31,7 @@ export class Mine {
         console.log(originalLength, ' ---- ', afterConsensusLength);
         if (originalLength === afterConsensusLength) {
             await this.announceNewBlock(lastBlock);
-            console.log(transaction);
+            console.log("SAME LENGTH -> ", transaction);
             await transactionsModel.deleteById(transaction.id);
         }
 
@@ -55,17 +55,18 @@ export class Mine {
         for (const node of peers) {
             client.baseURL = `http://${node.ip_address}`;
             const response = await client.get(`/registry`);
-            console.log(node, " - response:" , response);
-            const length = response.data.length
+            console.log(node, " - response:" , response.data);
+            const length = response.data.chain_length
             const chain = response.data.chain
             if ( length > longestChainLength && await blockchain.checkChainValidity(chain) ) {
                 longestChainLength = length
                 longestChain = chain
             }
         }
-        if (longestChain) {
-            await blockchain.createChainFromDump(longestChain);
-        }
+
+        console.log("LONGEST CHAIN LENGTH -> ",longestChainLength);
+        if (longestChain) await blockchain.createChainFromDump(longestChain);
+        
         console.log("================= CONSENSUS =================");
 		return
     }
@@ -81,11 +82,15 @@ export class Mine {
         if (!peers) return;
 
         const client = new HTTPRequest('');
-        const data = { block: JSON.stringify(block)};
+        const data = { block };
         
         for (const node of peers) {
             client.baseURL = `http://${node.ip_address}`
-            const response = await client.post(`/nodes/sync_block`, data);
+            try {
+                const response = await client.post(`/nodes/sync_block`, data);
+            } catch(error) {
+                console.log(error);
+            }
         }
     }
 }
