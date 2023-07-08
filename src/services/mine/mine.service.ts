@@ -1,6 +1,5 @@
 import { DatabaseResourceFactory } from "@database";
 import { CoreFactory } from "@core";
-
 import { HTTPRequest } from "@utils";
 export class Mine {
     #storage: DatabaseResourceFactory
@@ -32,9 +31,8 @@ export class Mine {
         console.log(originalLength, ' ---- ', afterConsensusLength);
         if (originalLength === afterConsensusLength) {
             await this.announceNewBlock(lastBlock);
-
-            const transactionModel = await this.#storage.createPendingTransactionsResource();
-            await transactionModel.deleteById(transaction.id);
+            console.log(transaction);
+            await transactionsModel.deleteById(transaction.id);
         }
 
         return {
