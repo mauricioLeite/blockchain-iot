@@ -1,7 +1,7 @@
 import { DatabaseResourceFactory } from '@database';
 import { Block, Blockchain, Peers } from '@core';
 
-import axios from 'axios';
+import { HTTPRequest } from '@utils';
 
 export class Nodes {
     #storage: DatabaseResourceFactory;
@@ -36,16 +36,9 @@ export class Nodes {
 
         const data = { node_address: host };
         const headers = { 'Content-Type': 'application/json' };
+        const client = new HTTPRequest(`http://${nodeAddr}:3000`)
+        const response = await client.post(`/nodes/register`, data, { headers });
 
-        const options = {
-            baseURL: `http://${nodeAddr}:3000`, 
-            url: `/nodes/register`,
-            method: 'POST',
-            data,
-            headers: headers 
-        };
-
-        const response = await axios.request(options);
 
         if (response.status === 201) {
             const { chain, networkNodes } = response.data;
