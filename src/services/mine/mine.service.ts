@@ -9,24 +9,21 @@ export class Mine {
         this.#storage = storage;
     }
 
-    /*
-    Mineração de blocos
-  */
     async mine() {
         const transactionsModel = await this.#storage.createPendingTransactionsResource();
         const transaction = transactionsModel.first();
         if (!transaction) {
             return {
-                message: "No transaction available.",
+                response: { message: "No transaction available." },
                 status: 200,
             }
         }
-
+        return { response: {message:"testing"}, status: 404 };
         const blockchain = new Blockchain(this.#storage);
         const minedBlockId = await blockchain.mine(transaction);
         if (!minedBlockId) {
             return {
-                message: "Error on mining process.",
+                response: { message: "Error on mining process." },
                 status: 500,
             }
         }
@@ -42,14 +39,11 @@ export class Mine {
         }
 
         return {
-            block: lastBlock,
+            response: { block: lastBlock },
             status: 200,
         }
     }
 
-    /*
-    Alcançar o consenso entre os pares da rede
-  */
     async consensus() {
         const blockchain = new Blockchain(this.#storage);
         const peersModel = await this.#storage.createPeersResource();
@@ -78,9 +72,6 @@ export class Mine {
 		return
     }
 
-    /*
-    Anunciar a inclusão de um novo bloco aos pares da rede
-  */
     async announceNewBlock(block: Block) {
         for (const key of Object.keys(block)) {
             if (!['index','transaction','nonce','previous_hash', 'hash'].includes(key)) delete block[key as keyof Block];
