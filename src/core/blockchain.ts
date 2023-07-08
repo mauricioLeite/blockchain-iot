@@ -48,10 +48,10 @@ export class Blockchain {
         const lastBlock = await this.lastBlock();
         const newBlock = new Block(
             lastBlock.index + 1,
-            unconfirmedTransaction.transaction,
+            unconfirmedTransaction.transaction_data,
             lastBlock.hash!
         )
-        const proof = this.proofOfWork(newBlock)
+        const proof = this.proofOfWork(newBlock);
         return await this.addBlock(newBlock, proof);
     }
 
