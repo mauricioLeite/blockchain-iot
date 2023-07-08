@@ -10,8 +10,8 @@ export class Nodes {
         this.#storage = storage;
     }
 
-    public async newNode(payload: newAddress) {
-        const newNodeAddr = payload.nodeAddress;
+    async newNode(payload: newAddress) {
+        const newNodeAddr = payload.node_address;
         
         if (!newNodeAddr) return { message: 'Missing nodeAddress field!' , status: 401 };
 
@@ -23,14 +23,14 @@ export class Nodes {
         await peerModel.create({ ip_address: newNodeAddr });
 
         const actualNetworkNodes = await this.#listPeers();
-        return { "message": "Registered successfully!", status: 201, networkNodes: actualNetworkNodes };
+        return { response: { message: "Registered successfully!", networkNodes: actualNetworkNodes }, status: 201};
     }
 
-    public async joinNetwork(payload: { node_address: string }, host: string) {
+    async joinNetwork(payload: newAddress, host: string) {
         const nodeAddr = payload.node_address;
 
         if (!nodeAddr) {
-            return { message: 'Missing node_address field!' , status: 401};
+            return { response: { message: 'Missing node_address field!'}, status: 401};
         }
 
         const data = { node_address: host };
@@ -42,9 +42,10 @@ export class Nodes {
             params: data,
             headers: headers 
         };
-
+        console.log(data, headers, options);
         const client = new Axios()
         const response = await client.request(options);
+        console.log("failed");
         
         if (response.status === 200) {
             const responsePayload = response.data;
@@ -52,13 +53,13 @@ export class Nodes {
             const peers = new Peers(this.#storage);
             blockchain.createChainFromDump(responsePayload.chain);
             peers.syncPeers([nodeAddr, ...responsePayload.peers], host);
-            return { message: 'Registration successful' , status: 200};
+            return { response: { message: 'Registration successful'}, status: 200};
         } else {
-            return { message: 'Error registering node in network.' , status: 500};
+            return { response: { message: 'Error registering node in network.'}, status: 500};
         }
     }
 
-    public async syncBlock(block: Block) {
+    async syncBlock(block: Block) {
         const proof = block.hash;
         delete block.hash;
 
@@ -73,10 +74,10 @@ export class Nodes {
     async #listPeers() {
         const peersInstance = new Peers(this.#storage);
         return await peersInstance.list();
-    }
+    }   
 
 }
 
 interface newAddress {
-    nodeAddress: string
+    node_address: string
 }       
