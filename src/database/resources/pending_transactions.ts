@@ -11,7 +11,7 @@ export class PendingTransactions extends Strategy {
 
     async first() : Promise<any | null> {
         const result = await this.repository.findOne({ where: {}});
-        result.transaction_data = JSON.parse(result.transaction_data);
+        if (result) result.transaction_data = JSON.parse(result.transaction_data);
         return result;
     }
 
