@@ -1,11 +1,13 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 export class HTTPRequest {
-    protected baseURL;
+    protected _baseURL;
 
     constructor(baseURL:string) {
-        this.baseURL = baseURL;
+        this._baseURL = baseURL;
     }
+    
+    set baseURL(value: string) { this._baseURL = value; }
 
     async get(path: string, data?: any, config?: any) {
         return await this.#request('GET', path, data, config);
@@ -17,7 +19,7 @@ export class HTTPRequest {
 
     async #request(method: string, path: string, data?: any, config?: any) {
         return await axios.request({
-            baseURL: this.baseURL, 
+            baseURL: this._baseURL, 
             url: path,
             method: method,
             data,
