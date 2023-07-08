@@ -19,9 +19,9 @@ export class CoreFactory {
         return await this.#initializeResource(Peers);
     }
 
-    async createBlock() {
-        return await this.#initializeResource(Block);
-    }
+    // async createBlock() {
+    //     return await this.#initializeResource(Block);
+    // }
 
     async #initializeResource(ResourceType: any, init = false) {
         const resource = new ResourceType(this.#storage);
