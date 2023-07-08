@@ -1,36 +1,31 @@
 import { DatabaseResourceFactory } from "@database";
-import { Block, Blockchain } from "@core";
+import { CoreFactory } from "@core";
 
-import { Axios } from 'axios';
+import { HTTPRequest } from "@utils";
 export class Mine {
     #storage: DatabaseResourceFactory
+    #core: CoreFactory
 
-    constructor( storage: DatabaseResourceFactory ) {
+    constructor( storage: DatabaseResourceFactory, core: CoreFactory ) {
         this.#storage = storage;
+        this.#core = core;
     }
 
     async mine() {
         const transactionsModel = await this.#storage.createPendingTransactionsResource();
-        const transaction = transactionsModel.first();
-        if (!transaction) {
-            return {
-                response: { message: "No transaction available." },
-                status: 200,
-            }
-        }
-        return { response: {message:"testing"}, status: 404 };
-        const blockchain = new Blockchain(this.#storage);
+        const transaction = await transactionsModel.first();
+        if (!transaction) return { response: { message: "No transaction available." }, status: 200}
+        
+        const blockchain = await this.#core.createBlockchain();
         const minedBlockId = await blockchain.mine(transaction);
-        if (!minedBlockId) {
-            return {
-                response: { message: "Error on mining process." },
-                status: 500,
-            }
-        }
+        if (!minedBlockId)  return { response: { message: "Error on mining process." }, status: 500 };
+        
+        const chain = await blockchain.chain();
+        const chainLength = chain.length;
 
-        const chainLength = blockchain.chain.length
-        await this.consensus();
+        await this.consensus(chainLength);
         const lastBlock = await blockchain.lastBlock();
+        return { response: {message:"TESTING"}, status: 404 };
         if (chainLength === blockchain.chain.length) {
             await this.announceNewBlock(lastBlock);
 
@@ -44,25 +39,23 @@ export class Mine {
         }
     }
 
-    async consensus() {
-        const blockchain = new Blockchain(this.#storage);
+    async consensus(chainCurrentLength: number) {
+        const blockchain = await this.#core.createBlockchain();
         const peersModel = await this.#storage.createPeersResource();
         let longestChain = null;
 
-        let currentLen = (await blockchain.chain()).length;
+        let longestChainLength = chainCurrentLength;
         const peers = peersModel.getAll();
-        for (const node of peers) {
-            const options = {
-                method: 'GET',
-                url: `http://${node.ip_address}/registry`, 
-            };
 
-            const client = new Axios()
-            const response = await client.request(options);
+        const client = new HTTPRequest('');
+        for (const node of peers) {
+            client.baseURL = `http://${node.ip_address}`;
+            const response = await client.get(`/registry`);
+
             const length = response.data.length
             const chain = response.data.chain
-            if ( length > currentLen && await blockchain.checkChainValidity(chain) ) {
-                currentLen = length
+            if ( length > longestChainLength && await blockchain.checkChainValidity(chain) ) {
+                longestChainLength = length
                 longestChain = chain
             }
         }

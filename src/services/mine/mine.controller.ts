@@ -3,8 +3,10 @@ import { Mine } from "./mine.service";
 import { DatabaseResourceFactory } from "@database";
 import { DatabaseConnector } from "@database/DatabaseConnector";
 import { Logger } from '@utils';
+import { CoreFactory } from "@core/factory";
 
 const storage = new DatabaseResourceFactory(new DatabaseConnector());
+const core = new CoreFactory(storage);
 
 export class MineController {
 
@@ -12,7 +14,7 @@ export class MineController {
         const logger = new Logger('nodes.controller.ts', '/services/nodes');
         logger.info({...req.body, method: "POST_register"});
 
-        const { response, status } = await new Mine(storage).mine();
+        const { response, status } = await new Mine(storage, core).mine();
         res.status(status);
         return res.json( response );
     }
