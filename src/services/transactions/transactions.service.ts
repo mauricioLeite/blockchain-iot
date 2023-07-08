@@ -11,19 +11,21 @@ export class Transactions {
         const transactionModel = await this.#storage.createPendingTransactionsResource();
         const inserted = await transactionModel.create({ transaction_data: JSON.stringify(payload) });
         
-        if (inserted)   return { message: "Transaction requested!", status: 201 };
-        return { message: "Internal Error", status: 500 };
+        if (inserted)   return { response: { message: "Transaction requested!" }, status: 201 };
+        return { response: { message: "Internal Error" }, status: 500 };
     }
 
     async pending() {
         const transactionModel = await this.#storage.createPendingTransactionsResource();
         const pendingTransaction = await transactionModel.getAll();
 
-        if (!pendingTransaction)   return { message: "Internal Error", status: 500 };
+        if (!pendingTransaction)   return { response: { message: "Internal Error" }, status: 500 };
         return {
-            unconfirmedTransactions: pendingTransaction,
-            length: pendingTransaction.length,
-            status: 200,
+            response : {
+                unconfirmedTransactions: pendingTransaction,
+                length: pendingTransaction.length
+            },
+            status: 200
         };
     }
 }
