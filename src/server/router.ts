@@ -15,6 +15,11 @@ router.get("/", function (_req: Request, res: Response) {
     });
 });
 
+//  Registry Service routes
+router.get("/registry", registry.get);
+router.delete("/registry", registry.delete);
+
+//  Transactions Service routes
 router.get("/transactions", transactions.get);
 router.post("/transactions", transactions.post);
 
