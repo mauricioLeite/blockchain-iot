@@ -31,8 +31,8 @@ export class NodesController {
     async postSyncBlock(req: Request, res: Response) {
         const logger = new Logger('nodes.controller.ts', '/services/nodes');
         logger.info({...req.body, method: "POST_syncBlock"});
-
-        const { response, status } = await new Nodes(storage, core).syncBlock(req.body);
+        
+        const { response, status } = await new Nodes(storage, core).syncBlock(req.body.block);
         res.status(status);
         return res.json( response );
     }
