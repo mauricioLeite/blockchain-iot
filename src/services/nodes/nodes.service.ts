@@ -62,9 +62,9 @@ export class Nodes {
         const blockchain = await this.#core.createBlockchain();
         const added = blockchain.addBlock(block, proof!);
 
-        if (!added) return { message: 'The block is discarded by the node.' , status: 500};
+        if (!added) return { response: { message: 'The block is discarded by the node.' } , status: 500};
 
-        return { message: 'Block added to the chain' , status:  201};
+        return { response: { message: 'Block added to the chain'}, status:  201 };
     }
 
     async #listPeers() {
