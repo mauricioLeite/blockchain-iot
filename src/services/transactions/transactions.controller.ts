@@ -10,7 +10,8 @@ const storage = new DatabaseResourceFactory(new DatabaseConnector());
 export class TransactionsController {
 
     async get(_req: Request, res: Response) {
-        const response = await new Transactions(storage).pending();
+        const { response, status } = await new Transactions(storage).pending();
+        res.status(status);
         return res.json( response );
     }
 
