@@ -4,10 +4,10 @@ export class HTTPRequest {
     protected _baseURL;
 
     constructor(baseURL:string) {
-        this._baseURL = baseURL;
+        this._baseURL = this.#getFormattedURL(baseURL);
     }
     
-    set baseURL(value: string) { this._baseURL = value; }
+    set baseURL(value: string) { this._baseURL = this.#getFormattedURL(value); }
 
     async get(path: string, data?: any, config?: any) {
         return await this.#request('GET', path, data, config);
@@ -25,6 +25,10 @@ export class HTTPRequest {
             data,
             ...config
         });
+    }
+
+    #getFormattedURL(url: string) {
+        return (process.env.ENV === "dev") ? `${url}:3000` : url;
     }
 }
 
