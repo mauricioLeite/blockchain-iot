@@ -81,7 +81,7 @@ export class Mine {
         if (!peers) return;
 
         const client = new HTTPRequest('');
-        const data = JSON.stringify(block)
+        const data = { block: JSON.stringify(block)};
         
         for (const node of peers) {
             client.baseURL = `http://${node.ip_address}`
