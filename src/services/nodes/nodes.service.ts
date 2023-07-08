@@ -1,7 +1,7 @@
 import { DatabaseResourceFactory } from '@database';
 import { CoreFactory } from '@core';
-
 import { HTTPRequest } from '@utils';
+import { Logger } from '@utils';
 
 export class Nodes {
     #storage: DatabaseResourceFactory;
@@ -58,11 +58,16 @@ export class Nodes {
     async syncBlock(block: any) {
         const proof = block.hash;
         delete block.hash;
-
+        
+        console.log(block);
         const blockchain = await this.#core.createBlockchain();
-        const added = blockchain.addBlock(block, proof!);
-
-        if (!added) return { response: { message: 'The block is discarded by the node.' } , status: 500};
+        const added = await blockchain.addBlock(block, proof!);
+        console.log(added);
+        if (!added)  {
+            const logger = new Logger('nodes.service.ts', '/services/nodes');
+            logger.info({block});
+            return { response: { message: 'The block is discarded by the node.' } , status: 500};
+        }
 
         return { response: { message: 'Block added to the chain'}, status:  201 };
     }
