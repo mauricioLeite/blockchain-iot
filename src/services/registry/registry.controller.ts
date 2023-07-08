@@ -9,7 +9,8 @@ const storage = new DatabaseResourceFactory(new DatabaseConnector());
 export class RegistryController {
 
     async get(_req: Request, res: Response) {
-        const response = await new Registry(storage).list();
+        const { response, status } = await new Registry(storage).list();
+        res.status(status);
         return res.json( response );
     }
 
@@ -17,7 +18,8 @@ export class RegistryController {
         const logger = new Logger('registry.controller.ts', '/services/registry');
         logger.info({ method: "DELETE" });
 
-        const response = await new Registry(storage).clearLocal();
+        const { response, status } = await new Registry(storage).clearLocal();
+        res.status(status);
         return res.json( response );
     }
 

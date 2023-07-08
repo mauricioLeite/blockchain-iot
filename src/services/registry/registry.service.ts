@@ -13,7 +13,10 @@ export class Registry {
         const peers = await peersInstance.list();
         const chain = await blockchain.chain();
 
-        return { chain: chain, peers: peers, length: chain.length, status: 200 }
+        return { 
+            response: { chain: chain, peers: peers, length: chain.length},
+            status: 200 
+        }
     }
 
     /*
@@ -26,6 +29,6 @@ export class Registry {
         peersModel.truncate();
         blockModel.truncate();
 
-        return { message: 'Clear complete!' , status: 200};
+        return { response: { message: 'Clear complete!' }, status: 200};
     }
 }
