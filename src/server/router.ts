@@ -15,6 +15,9 @@ router.get("/", function (_req: Request, res: Response) {
     });
 });
 
+//  Mine Service routes
+router.post("/mine", mine.post);
+
 //  Nodes Service routes
 router.post("/nodes/register", nodes.post_register);
 router.post("/nodes/join", nodes.post_join);
