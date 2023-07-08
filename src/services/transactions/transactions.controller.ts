@@ -16,7 +16,7 @@ export class TransactionsController {
 
     async post(req: Request, res: Response) {
         const logger = new Logger('transactions.controller.ts', '/services/transactions');
-        logger.info(req.body);
+        logger.info({...req.body, method: "POST"});
         
         const { response, status} = await new Transactions(storage).create(req.body);
         res.status(status);
