@@ -1,11 +1,8 @@
 import { DatabaseResourceFactory } from '@database';
 import { Block, Blockchain, Peers } from '@core';
-import { Registry } from '../registry/registry.service';
 
-// Use another request library
 import { Axios } from 'axios';
 
-// Classe que lida com comunicação e armazenamento de dados relacionados à blockchain
 export class Nodes {
     #storage: DatabaseResourceFactory;
 
@@ -13,29 +10,22 @@ export class Nodes {
         this.#storage = storage;
     }
 
-    /*
-    Verifica se o endereço do novo nó está presente e, em caso afirmativo, adiciona o novo nó ao armazenamento de pares (peers) e retorna a lista de pares atualizada
-    */
     public async newNode(payload: newAddress) {
         const newNodeAddr = payload.nodeAddress;
         
         if (!newNodeAddr) return { message: 'Missing nodeAddress field!' , status: 401 };
-        
-        const instance = new Registry(this.#storage);
-        const networkNodes = (await instance.list()).peers;
+
+        const networkNodes = await this.#listPeers();
         
         if (networkNodes.includes(newNodeAddr)) return { message: 'Address already registered!' , status: 409 };
 
         const peerModel = await this.#storage.createPeersResource();
         await peerModel.create({ ip_address: newNodeAddr });
 
-        const actualNetworkNodes = (await instance.list()).peers;
+        const actualNetworkNodes = await this.#listPeers();
         return { "message": "Registered successfully!", status: 201, networkNodes: actualNetworkNodes };
     }
 
-    /*
-    Verifica se o endereço do novo nó está presente e, em caso afirmativo, envia uma solicitação POST para o endereço especificado para registrar o novo nó
-    */
     public async joinNetwork(payload: { node_address: string }, host: string) {
         const nodeAddr = payload.node_address;
 
@@ -68,9 +58,6 @@ export class Nodes {
         }
     }
 
-    /*
-    Tenta adicionar um bloco à cadeia de blocos
-    */
     public async syncBlock(block: Block) {
         const proof = block.hash;
         delete block.hash;
@@ -81,6 +68,11 @@ export class Nodes {
         if (!added) return { message: 'The block is discarded by the node.' , status: 500};
 
         return { message: 'Block added to the chain' , status:  201};
+    }
+
+    async #listPeers() {
+        const peersInstance = new Peers(this.#storage);
+        return await peersInstance.list();
     }
 
 }
