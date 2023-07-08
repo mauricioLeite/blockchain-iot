@@ -81,18 +81,11 @@ export class Mine {
         if (!peers) return;
 
         const client = new HTTPRequest('');
-        const data = { json: JSON.stringify(block) }
+        const data = JSON.stringify(block)
         
         for (const node of peers) {
             client.baseURL = `http://${node.ip_address}`
             const response = await client.post(`/nodes/sync_block`, data);
         }
     }
-}
-
-interface ClientOptions {
-    method: string,
-    url?: string,
-    params?: object,
-    headers?: object
 }
