@@ -57,8 +57,6 @@ export class Nodes {
 
     async syncBlock(block: any) {
         const proof = block.hash;
-        delete block.hash;
-        
         const syncBlock = new Block(
             block.index,
             block.transaction,
@@ -66,18 +64,15 @@ export class Nodes {
         )
         syncBlock.nonce = block.nonce;
 
-        console.log(syncBlock);
-
         const blockchain = await this.#core.createBlockchain();
-        const added = await blockchain.addBlock(block, proof!);
-        console.log(added);
+        const added = await blockchain.addBlock(syncBlock, proof!);
         if (!added)  {
             const logger = new Logger('nodes.service.ts', '/services/nodes');
             logger.info(block);
             return { response: { message: 'The block is discarded by the node.' } , status: 500};
         }
 
-        return { response: { message: 'Block added to the chain'}, status:  201 };
+        return { response: { message: 'Block added to the chain' }, status:  201 };
     }
 
     async #listPeers() {
