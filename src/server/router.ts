@@ -19,8 +19,9 @@ router.get("/", function (_req: Request, res: Response) {
 router.post("/mine", mine.post);
 
 //  Nodes Service routes
-router.post("/nodes/register", nodes.post_register);
-router.post("/nodes/join", nodes.post_join);
+router.post("/nodes/register", nodes.postRegister);
+router.post("/nodes/join", nodes.postJoin);
+router.post("/nodes/sync_block", nodes.postSyncBlock)
 
 //  Registry Service routes
 router.get("/registry", registry.get);
