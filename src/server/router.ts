@@ -16,5 +16,6 @@ router.get("/", function (_req: Request, res: Response) {
 });
 
 router.get("/transactions", transactions.get);
+router.post("/transactions", transactions.post);
 
 export { router };
