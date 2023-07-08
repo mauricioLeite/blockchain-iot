@@ -1,6 +1,7 @@
 import { DatabaseResourceFactory } from "@database";
 import { CoreFactory } from "@core";
 import { HTTPRequest } from "@utils";
+import { Logger } from "@utils";
 export class Mine {
     #storage: DatabaseResourceFactory
     #core: CoreFactory
@@ -28,10 +29,8 @@ export class Mine {
         chain = await blockchain.chain();
         const afterConsensusLength = chain.length;
 
-        console.log(originalLength, ' ---- ', afterConsensusLength);
         if (originalLength === afterConsensusLength) {
             await this.announceNewBlock(lastBlock);
-            console.log("SAME LENGTH -> ", transaction);
             await transactionsModel.deleteById(transaction.id);
         }
 
@@ -42,20 +41,17 @@ export class Mine {
     }
 
     async consensus(chainCurrentLength: number) {
-        console.log("================= CONSENSUS =================");
         const blockchain = await this.#core.createBlockchain();
         const peersModel = await this.#storage.createPeersResource();
         let longestChain = null;
 
         let longestChainLength = chainCurrentLength;
         const peers = await peersModel.getAll();
-        console.log("peers --->", peers);
 
         const client = new HTTPRequest('');
         for (const node of peers) {
             client.baseURL = `http://${node.ip_address}`;
             const response = await client.get(`/registry`);
-            console.log(node, " - response:" , response.data);
             const length = response.data.chain_length
             const chain = response.data.chain
             if ( length > longestChainLength && await blockchain.checkChainValidity(chain) ) {
@@ -64,10 +60,8 @@ export class Mine {
             }
         }
 
-        console.log("LONGEST CHAIN LENGTH -> ",longestChainLength);
         if (longestChain) await blockchain.createChainFromDump(longestChain);
         
-        console.log("================= CONSENSUS =================");
 		return
     }
 
@@ -89,7 +83,8 @@ export class Mine {
             try {
                 const response = await client.post(`/nodes/sync_block`, data);
             } catch(error) {
-                console.log(error);
+                const logger = new Logger('mine.service.ts', '/services/mine');
+                logger.info({ error: error.response });
             }
         }
     }
