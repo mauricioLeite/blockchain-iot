@@ -1,5 +1,6 @@
 import { DatabaseResourceFactory } from "@database";
 import { Block } from "./block"
+import { Logger } from "@utils";
 
 export class Blockchain {
     //TODO: ainda vai ser injetado, mudar a tipagem para o tipo do adaptador
@@ -48,10 +49,10 @@ export class Blockchain {
         const lastBlock = await this.lastBlock();
         const newBlock = new Block(
             lastBlock.index + 1,
-            unconfirmedTransaction.transaction,
+            unconfirmedTransaction.transaction_data,
             lastBlock.hash!
         )
-        const proof = this.proofOfWork(newBlock)
+        const proof = this.proofOfWork(newBlock);
         return await this.addBlock(newBlock, proof);
     }
 
@@ -69,6 +70,7 @@ export class Blockchain {
     async addBlock(block: Block, proof: string) {
         const lastBlock = await this.lastBlock();
         const previousHash = lastBlock.hash;
+
         if (previousHash !== block.previousHash) return false
         if (!this.isValidProof(block, proof)) return false
         block.hash = proof
@@ -130,7 +132,10 @@ export class Blockchain {
                 refereceBlock.nonce = blockData.nonce;
                 
                 const added = await this.addBlock(refereceBlock, proof)
-                if (!added) console.log("The chain dump is tampered!!")
+                if (!added) {
+                    const logger = new Logger('blockchain.ts', '/core');
+                    logger.info({ message: "The chain dump is tampered!!" });
+                }
             }
         }
         return this.chain()

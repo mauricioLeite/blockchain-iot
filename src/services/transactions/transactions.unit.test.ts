@@ -1,4 +1,4 @@
-import { Transactions  } from "./transactions";
+import { Transactions  } from "./transactions.service";
 import { DatabaseResourceFactory } from "@database";
 
 import { generateRandomMacAddress } from "@utils/generate";

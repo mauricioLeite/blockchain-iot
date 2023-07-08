@@ -1,7 +1,4 @@
 import "module-alias/register";
+import { Server } from "./server";
 
-const main = async () => {
-    return;
-}
-
-main()
+new Server().listen(); 

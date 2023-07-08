@@ -9,4 +9,10 @@ export class PendingTransactions extends Strategy {
         this.entity = PendingTransactionsEntity;
     }
 
+    async first() : Promise<any | null> {
+        const result = await this.repository.findOne({ where: {}});
+        if (result) result.transaction_data = JSON.parse(result.transaction_data);
+        return result;
+    }
+
 }   

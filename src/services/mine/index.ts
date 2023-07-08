@@ -1,0 +1,1 @@
+export { MineController } from './mine.controller';
