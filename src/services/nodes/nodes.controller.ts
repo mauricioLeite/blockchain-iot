@@ -10,7 +10,7 @@ const core = new CoreFactory(storage);
 
 export class NodesController {
 
-    async post_register(req: Request, res: Response) {
+    async postRegister(req: Request, res: Response) {
         const logger = new Logger('nodes.controller.ts', '/services/nodes');
         logger.info({...req.body, method: "POST_register"});
 
@@ -19,7 +19,7 @@ export class NodesController {
         return res.json( response );
     }
 
-    async post_join(req: Request, res: Response) {
+    async postJoin(req: Request, res: Response) {
         const logger = new Logger('nodes.controller.ts', '/services/nodes');
         logger.info({...req.body, method: "POST_join"});
 
@@ -28,4 +28,12 @@ export class NodesController {
         return res.json( response );
     }
 
+    async postSyncBlock(req: Request, res: Response) {
+        const logger = new Logger('nodes.controller.ts', '/services/nodes');
+        logger.info({...req.body, method: "POST_syncBlock"});
+
+        const { response, status } = await new Nodes(storage, core).syncBlock(req.body);
+        res.status(status);
+        return res.json( response );
+    }
 }
