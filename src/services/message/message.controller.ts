@@ -1,8 +1,7 @@
-import { Request, Response } from "express";
 import { Message } from './message.service';
 import { DatabaseResourceFactory } from "@database";
 import { DatabaseConnector } from "@database/DatabaseConnector";
-import { Logger } from '@utils';
+import { ForwardMessage, Logger } from '@utils';
 import { CoreFactory } from "@core/factory";
 
 const storage = new DatabaseResourceFactory(new DatabaseConnector());
@@ -10,14 +9,15 @@ const core = new CoreFactory(storage);
 
 export class MessageController {
 
-    async post (topic: string, message: any, packet: any) {
+    async processMessage (topic: string, message: any, packet: any) {
+        message = JSON.parse(message.toString());
+        
         const logger = new Logger('message.controller.ts', '/services/message');
-        message = JSON.parse(message);
-        logger.info({...message, topic});
+        logger.info({ message, topic, action: "CONSUME"});
 
         const { response, target } = await new Message(storage, core).processMessage(message);
-        
-        console.log(response, target);
+        const client = new ForwardMessage(target);
+        client.publishMessage(response);
     }
 
 }
