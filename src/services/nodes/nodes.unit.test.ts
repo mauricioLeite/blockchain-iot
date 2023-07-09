@@ -1,13 +1,15 @@
 import { Nodes  } from "./nodes.service";
 import { DatabaseResourceFactory } from "@database";
+import { CoreFactory } from "@core";
 
 describe("Nodes Service", () => {
 
     describe("#init", () => {
-        const instance: Nodes = new Nodes(new DatabaseResourceFactory());
+        const storage = new DatabaseResourceFactory();
+        const instance: Nodes = new Nodes(storage, new CoreFactory(storage));
 
         it("should add a new node to network", async () => {
-            const payload = { nodeAddress: "123.456.789.101"};
+            const payload = { node_address: "123.456.789.101"};
             const result = await instance.newNode(payload);
             expect(result).toHaveProperty('status');
             expect(result.status).toBe(201);
