@@ -7,7 +7,7 @@ export class ForwardMessage {
 
     constructor(deviceHash: string) {
         // Implement BROKER authentication
-        this.#publishTopic = `v1/devices/${deviceHash}`;
+        this.#publishTopic = `v1/device/${deviceHash}/message`;
         this.#client = mqtt.connect(this.#formatAddress());
     }
 

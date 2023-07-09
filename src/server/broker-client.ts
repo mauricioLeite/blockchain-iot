@@ -9,7 +9,7 @@ export class BrokerClient {
 
     constructor() {
         // Implement BROKER authentication
-        this.#subscribeTopic = 'v1/devices/sendMessage'
+        this.#subscribeTopic = 'v1/manager/message'
         this.#client = mqtt.connect(this.#formatAddress());
         this.#init();
     }
