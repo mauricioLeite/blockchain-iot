@@ -1,6 +1,5 @@
 import { DatabaseResourceFactory } from "@database";
 import { CoreFactory } from "@core";
-import { HTTPRequest } from "@utils";
 import { Logger } from "@utils";
 
 export class Message {
@@ -13,7 +12,9 @@ export class Message {
     }
 
     async processMessage(message: any) {
-        return { response: message.message , target: message.toDevice };
+        // ! IMPLEMENT LOGIC TO HANDLE MESSAGE AND GENERATE FORWARD TARGET
+
+        return { response: message.message  , target: message.toDevice };
     }
 
 }
