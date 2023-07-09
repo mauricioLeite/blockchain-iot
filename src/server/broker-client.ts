@@ -18,23 +18,12 @@ export class BrokerClient {
         this.#client.on("connect", () => {
             console.log(`CONNECTED... LISTENING: ${this.#subscribeTopic}`);
             this.#client.subscribe(`${this.#subscribeTopic}`);
-            this.#client.on('message', this.processMessage)
+            this.#client.on('message', message.processMessage)
         })
         
         this.#client.on("error", (error) => { 
             console.log(`Can't connect: ${error}`); 
         });
-    }
-
-    processMessage (topic: string, message: any, packet: any) {
-            // Proccess message here;
-            let str = `\nTOPIC: ${topic} RECEIVED --\n`;
-            str += `message:${message}`;
-            console.log(str);
-    }
-
-    publishMessage(message: string) {
-        this.#client.publish(this.#subscribeTopic, message);
     }
 
     #formatAddress() {
