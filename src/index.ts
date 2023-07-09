@@ -1,4 +1,6 @@
 import "module-alias/register";
-import { Server } from "./server";
+import { BrokerClient, Server } from "./server";
 
 new Server().listen(); 
+
+new BrokerClient();
