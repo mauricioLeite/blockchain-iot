@@ -3,7 +3,6 @@ import { Block } from "./block"
 import { Logger } from "@utils";
 
 export class Blockchain {
-    //TODO: ainda vai ser injetado, mudar a tipagem para o tipo do adaptador
     #storage: DatabaseResourceFactory
     #difficulty = 2
     constructor(_storage: DatabaseResourceFactory) {
