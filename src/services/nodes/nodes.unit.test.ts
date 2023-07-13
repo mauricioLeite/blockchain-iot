@@ -10,11 +10,10 @@ describe("Nodes Service", () => {
 
         it("should add a new node to network", async () => {
             const payload = { node_address: "123.456.789.101"};
-            const result = await instance.newNode(payload);
-            expect(result).toHaveProperty('status');
-            expect(result.status).toBe(201);
-            expect(result).toHaveProperty('message');
-            expect(result).toHaveProperty('networkNodes');
+            const { response, status } = await instance.newNode(payload);
+            expect(status).toBe(201);
+            expect(response).toHaveProperty('message');
+            expect(response).toHaveProperty('networkNodes');
         })
 
         // !MINE TEST BEFORE TO GENERATE VALID BLOCK 
