@@ -9,7 +9,7 @@ describe("resource Transactions", () => {
         const instance = new PendingTransactions(new DatabaseConnector());
 
         const pendingTransactionsData = { 
-            transaction_data : '{data: "test"}'
+            transaction_data : '{"uuid":"e270a4a8-c4f3-4373-a7e5-109eb8e723e2"}'
         };
 
         it("should init", async () => {
@@ -29,7 +29,7 @@ describe("resource Transactions", () => {
             const result = await instance.first();
 
             expect(result).toBeInstanceOf(PendingTransactionsEntity);
-            expect(result?.transaction_data).toEqual(pendingTransactionsData.transaction_data);
+            expect(JSON.stringify(result?.transaction_data)).toEqual(pendingTransactionsData.transaction_data);
 
         });
 
