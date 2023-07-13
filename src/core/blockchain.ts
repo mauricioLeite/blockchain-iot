@@ -1,4 +1,4 @@
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { DatabaseResourceFactory } from "@database";
 import { Block } from "./block"
 import { Logger } from "@utils";
