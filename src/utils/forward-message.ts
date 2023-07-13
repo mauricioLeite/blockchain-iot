@@ -4,9 +4,11 @@ import { Logger } from './logger';
 export class ForwardMessage {
     #client: MqttClient;
     #publishTopic: string;
+    #deviceHash: string
 
     constructor(deviceHash: string) {
         // Implement BROKER authentication
+        this.#deviceHash = deviceHash;
         this.#publishTopic = `v1/device/${deviceHash}/message`;
         this.#client = mqtt.connect(this.#formatAddress());
     }
@@ -24,7 +26,7 @@ export class ForwardMessage {
     publishMessage(message: string) {
         this.#init();
         const logger = new Logger('forward-message.ts', '/util/');
-        logger.info({ topic: this.#publishTopic, message, action: 'PUBLISH'});
+        logger.info({ topic: this.#publishTopic, message, target: this.#deviceHash, action: 'PUBLISH'});
         this.#client.publish(this.#publishTopic, JSON.stringify(message));
     }
 
