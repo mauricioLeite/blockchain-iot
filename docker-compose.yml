@@ -25,3 +25,10 @@ services:
       - "3000:3000"
     restart: unless-stopped
     container_name: blockchain-iot
+    networks:
+       - mqtt-docker_net
+        
+
+networks:
+  mqtt-docker_net:
+    external: true

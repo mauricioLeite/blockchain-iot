@@ -1,11 +1,12 @@
+import { v4 as uuidv4 } from 'uuid';
 import { DatabaseResourceFactory } from "@database";
 import { Block } from "./block"
 import { Logger } from "@utils";
 
 export class Blockchain {
-    //TODO: ainda vai ser injetado, mudar a tipagem para o tipo do adaptador
     #storage: DatabaseResourceFactory
     #difficulty = 2
+
     constructor(_storage: DatabaseResourceFactory) {
         this.#storage = _storage
     }
@@ -20,7 +21,7 @@ export class Blockchain {
         if (await blocksModel.countRows() == 0) {
             let genesisBlock: Block;
             if (!reference) {
-                genesisBlock = new Block(0, [], "0", new Date())
+                genesisBlock = new Block(0, [], "0", new Date(), uuidv4())
                 genesisBlock.hash = this.proofOfWork(genesisBlock);
             } else {
                 genesisBlock = reference;

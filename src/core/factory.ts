@@ -1,4 +1,4 @@
-import { Block } from "./block";
+// import { Block } from "./block";
 import { Blockchain } from "./blockchain";
 import { Peers } from "./peers";
 

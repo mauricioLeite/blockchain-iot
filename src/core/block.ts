@@ -5,6 +5,7 @@ export class Block {
     index: number
     transaction: { [x: string]: any }
     previousHash: string
+    uuid?: string | null
     createdAt?: Date | null
     nonce: number
     hash?: string | null
@@ -14,15 +15,17 @@ export class Block {
         _transaction: { [x: string]: any },
         _previousHash: string,
         _created_at: Date | null = null,
+        _uuid: string | null = null,
         _nonce = 0,
         _hash: string | null = null
     ) {
         this.index = _index
         this.transaction = (typeof _transaction === "string") ? JSON.parse(_transaction) : _transaction;
-        this.previousHash = _previousHash
-        this.nonce = _nonce
-        if (_created_at) this.createdAt = _created_at
-        if (_hash) this.hash = _hash
+        this.previousHash = _previousHash;
+        this.uuid = (typeof _uuid === "string") ? _uuid : this.transaction.uuid;
+        this.nonce = _nonce;
+        if (_created_at) this.createdAt = _created_at;
+        if (_hash) this.hash = _hash;
     }
 
     computeHash(): string {
@@ -36,11 +39,12 @@ export class Block {
             transaction : JSON.stringify(this.transaction),
             previous_hash : this.previousHash,
             nonce : this.nonce,
+            uuid: this.uuid,
             hash : this.hash,   
         }, this.createdAt ? {created_at: this.createdAt} : null);   
     }
 
     static createFromObject(reference: { [x: string]: any }) {
-        return new Block(reference.index, reference.transaction, reference.previous_hash, reference.created_at, reference.nonce, reference.hash);
+        return new Block(reference.index, reference.transaction, reference.previous_hash, reference.uuid, reference.created_at, reference.nonce, reference.hash);
     }
 }

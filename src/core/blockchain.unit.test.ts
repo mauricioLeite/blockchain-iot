@@ -3,7 +3,6 @@ import { Blockchain } from "./blockchain";
 
 import { Devices as DevicesResource} from "@database/entities/devices.entity";
 import { Block } from "./block";
-import { generateRandomMacAddress } from "@utils/generate";
 
 describe("Core Blockchain", () => {
 
@@ -33,8 +32,8 @@ describe("Core Blockchain", () => {
         })
 
         it("should mine new block", async () => {
-            const transaction: object = { macAddress:  generateRandomMacAddress()};
-            const result = await instance.mine({ transaction });
+            const transaction_data: object = { uuid: 'e270a4a8-c4f3-4373-a7e5-109eb8e723e2'};
+            const result = await instance.mine({ transaction_data });
             expect(typeof result).toBe('number');
         })
 
@@ -83,41 +82,45 @@ describe("Core Blockchain", () => {
 
 function getChainDump() {
     return [
-        {
-          id: 1,
-          index: 0,
-          transaction: '[]',
-          created_at: '2023-06-30T00:03:11.285Z',
-          previous_hash: '0',
-          nonce: 4,
-          hash: '008de7471dd29e23a9ded982e5dcc987c1d4b267bb5286b4eca29d25dfc06c92'
-        },
-        {
-          id: 2,
-          index: 1,
-          transaction: '{"macAddress":"12:C0:25:4A:C6:38"}',
-          created_at: '2023-06-30T00:03:11.000Z',
-          previous_hash: '008de7471dd29e23a9ded982e5dcc987c1d4b267bb5286b4eca29d25dfc06c92',
-          nonce: 259,
-          hash: '000c2cb76ecf7860cfbb66bb0b39fac398805ebefd365f6f392243e4a5392c6f'
-        },
-        {
-          id: 3,
-          index: 2,
-          transaction: '{"macAddress":"E0:F3:F9:15:D5:34"}',
-          created_at: '2023-06-30T00:03:18.000Z',
-          previous_hash: '000c2cb76ecf7860cfbb66bb0b39fac398805ebefd365f6f392243e4a5392c6f',
-          nonce: 104,
-          hash: '00c18f80e783b3fdab2078b4588f772f0d2dceb8ce3ea5cc0bae04be453311ce'
-        },
-        {
-          id: 4,
-          index: 3,
-          transaction: '{"macAddress":"4D:24:3E:48:4E:05"}',
-          created_at: '2023-06-30T00:03:37.000Z',
-          previous_hash: '00c18f80e783b3fdab2078b4588f772f0d2dceb8ce3ea5cc0bae04be453311ce',
-          nonce: 49,
-          hash: '00e4abeb7124fbdb0360acf847cedd6545197fe2f195595953e3442e795cad2a'
-        }
-      ]
+		{
+			id: 17,
+			index: 0,
+			uuid: "146e3e34-5584-451a-b416-88d7c45cdd40",
+			transaction: "[]",
+			created_at: "2023-07-09T21:49:33.365Z",
+			previous_hash: "0",
+			nonce: 119,
+			hash: "002700d2797b6640e118d9ce96617d0879d6ef138450feba36373d96dea8d5c3"
+		},
+		{
+			id: 18,
+			index: 1,
+			uuid: "016f0181-57a7-4ae3-8f9e-0a7a034d5b57",
+			transaction: "{\"uuid\":\"016f0181-57a7-4ae3-8f9e-0a7a034d5b57\"}",
+			created_at: "2023-07-09T21:56:21.000Z",
+			previous_hash: "002700d2797b6640e118d9ce96617d0879d6ef138450feba36373d96dea8d5c3",
+			nonce: 230,
+			hash: "009fa4037697bad4456980f6bf29582bb7773269c1c6616fcdcabcaf09435576"
+		},
+		{
+			id: 19,
+			index: 2,
+			uuid: "f62e61a6-2dd7-45ff-8853-14d9f6ee1630",
+			transaction: "{\"uuid\":\"f62e61a6-2dd7-45ff-8853-14d9f6ee1630\"}",
+			created_at: "2023-07-09T21:56:22.000Z",
+			previous_hash: "009fa4037697bad4456980f6bf29582bb7773269c1c6616fcdcabcaf09435576",
+			nonce: 334,
+			hash: "0076b56279ef65adff3622cd9a904e7c5b526907f2f80363194c43dbdd60d749"
+		},
+		{
+			id: 20,
+			index: 3,
+			uuid: "e270a4a8-c4f3-4373-a7e5-109eb8e723e2",
+			transaction: "{\"uuid\":\"e270a4a8-c4f3-4373-a7e5-109eb8e723e2\"}",
+			created_at: "2023-07-09T21:56:23.000Z",
+			previous_hash: "0076b56279ef65adff3622cd9a904e7c5b526907f2f80363194c43dbdd60d749",
+			nonce: 506,
+			hash: "00be9387dbf894f97f2bfb7d499a7bf4fb491bdc2fdaa284b1da8b2173aea8d5"
+		}
+	]
 }

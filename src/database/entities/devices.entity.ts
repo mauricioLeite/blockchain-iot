@@ -8,6 +8,9 @@ export class Devices {
     @Column()
     index: number;
 
+    @Column()
+    uuid: number;
+
     @Column({ type: "text" })
     transaction: string;
 

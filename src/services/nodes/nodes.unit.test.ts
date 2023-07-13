@@ -1,18 +1,19 @@
 import { Nodes  } from "./nodes.service";
 import { DatabaseResourceFactory } from "@database";
+import { CoreFactory } from "@core";
 
 describe("Nodes Service", () => {
 
     describe("#init", () => {
-        const instance: Nodes = new Nodes(new DatabaseResourceFactory());
+        const storage = new DatabaseResourceFactory();
+        const instance: Nodes = new Nodes(storage, new CoreFactory(storage));
 
         it("should add a new node to network", async () => {
-            const payload = { nodeAddress: "123.456.789.101"};
-            const result = await instance.newNode(payload);
-            expect(result).toHaveProperty('status');
-            expect(result.status).toBe(201);
-            expect(result).toHaveProperty('message');
-            expect(result).toHaveProperty('networkNodes');
+            const payload = { node_address: "123.456.789.101"};
+            const { response, status } = await instance.newNode(payload);
+            expect(status).toBe(201);
+            expect(response).toHaveProperty('message');
+            expect(response).toHaveProperty('networkNodes');
         })
 
         // !MINE TEST BEFORE TO GENERATE VALID BLOCK 
